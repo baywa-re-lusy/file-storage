@@ -1,6 +1,6 @@
 <?php
 
-namespace BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
+namespace BayWaReLusy\FileStorageTools\Exception;
 
 class DirectoryAlreadyExistsException extends \Exception
 {

@@ -50,4 +50,16 @@ class FileStorageService
     {
         return $this->adapter;
     }
+
+    /**
+     * @param string $path
+     * @return void
+     * @throws Exception\DirectoryAlreadyExistsException
+     * @throws Exception\ParentNotFoundException
+     * @throws Exception\UnknownErrorException
+     */
+    public function createDirectory(string $path): void
+    {
+        $this->getAdapter()->createDirectory($path);
+    }
 }

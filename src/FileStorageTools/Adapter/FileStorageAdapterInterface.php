@@ -13,7 +13,9 @@
 
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
-use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
+use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 
 /**
  * FileStorageAdapterInterface
@@ -31,6 +33,8 @@ interface FileStorageAdapterInterface
      * @param string $path
      * @return void
      * @throws DirectoryAlreadyExistsException
+     * @throws ParentNotFoundException
+     * @throws UnknownErrorException
      */
     public function createDirectory(string $path): void;
 }

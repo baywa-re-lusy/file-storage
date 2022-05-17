@@ -13,6 +13,10 @@
 
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
+use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
+use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
+use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 use MicrosoftAzure\Storage\File\FileRestProxy as FileStorageClient;
 
 /**
@@ -44,8 +48,14 @@ class AzureAdapter implements FileStorageAdapterInterface
     {
         try {
             $this->fileStorageClient->createDirectory($this->fileShare, $path);
-        } catch () {
+        } catch (ServiceException $e) {
+            if (str_contains($e->getMessage(), '<Code>ResourceAlreadyExists</Code>')) {
+                throw new DirectoryAlreadyExistsException(sprintf("The directory '%s' already exists.", $path));
+            } elseif (str_contains($e->getMessage(), '<Code>ParentNotFound</Code>')) {
+                throw new ParentNotFoundException("The parent of the directory you want to create doesn't exist.");
+            }
 
+            throw new UnknownErrorException('Unknown File Storage error');
         }
     }
 }
