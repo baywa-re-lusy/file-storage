@@ -1,0 +1,5 @@
+composer.lock
+results/
+results/*
+vendor
+.idea

@@ -1,0 +1,21 @@
+{
+    "name": "baywa-re-lusy/file-storage",
+    "description": "BayWa r.e. LUSY File Storage Tools",
+    "type": "library",
+    "license": "proprietary",
+    "homepage": "https://github.com/baywa-re-lusy/file-storage",
+    "require": {
+        "php": ">= 8.0",
+        "laminas/laminas-servicemanager": "^3.6",
+        "microsoft/azure-storage-file": "^1.2"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.6",
+        "phpstan/phpstan": "^1.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "BayWaReLusy\\FileStorageTools\\": "src/FileStorageTools"
+        }
+    }
+}
