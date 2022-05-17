@@ -13,7 +13,7 @@
 
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
-use BayWaReLusy\QueueTools\FileServiceToolsConfig;
+use BayWaReLusy\FileStorageTools\FileServiceToolsConfig;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use MicrosoftAzure\Storage\File\FileRestProxy;

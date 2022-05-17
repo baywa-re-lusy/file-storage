@@ -10,7 +10,7 @@
  *              prohibited, proprietary and confidential.
  */
 
-namespace BayWaReLusy\QueueTools;
+namespace BayWaReLusy\FileStorageTools;
 
 /**
  * Class FileServiceToolsConfig

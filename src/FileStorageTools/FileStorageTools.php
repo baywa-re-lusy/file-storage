@@ -13,7 +13,6 @@
 
 namespace BayWaReLusy\FileStorageTools;
 
-use BayWaReLusy\QueueTools\FileServiceToolsConfig;
 use Laminas\ServiceManager\ServiceManager;
 
 /**
@@ -22,7 +21,7 @@ use Laminas\ServiceManager\ServiceManager;
  * Entry-point to use the tool-set
  *
  * @package     BayWaReLusy
- * @subpackage  QueueTools
+ * @subpackage  FileStorageTools
  * @author      Pascal Paulis <pascal.paulis@baywa-re.com>
  * @copyright   Copyright (c) BayWa r.e. - All rights reserved
  * @license     Unauthorized copying of this source code, via any medium is strictly
