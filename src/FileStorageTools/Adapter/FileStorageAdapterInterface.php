@@ -14,8 +14,10 @@
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
+use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 
 /**
@@ -51,6 +53,16 @@ interface FileStorageAdapterInterface
      * @param string $pathToFile Path and name of the file to upload
      * @return void
      * @throws LocalFileNotFoundException
+     * @throws FileCouldNotBeOpenedException
      */
     public function uploadFile(string $directory, string $pathToFile): void;
+
+    /**
+     * Delete a file from the File Share.
+     *
+     * @param string $pathToFile Path and name of the file to delete
+     * @return void
+     * @throws RemoteFileDoesntExistException
+     */
+    public function deleteFile(string $pathToFile): void;
 }

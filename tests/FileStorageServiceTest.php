@@ -4,8 +4,10 @@ namespace BayWaReLusy\FileStorageTools\Test;
 
 use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
+use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 use BayWaReLusy\FileStorageTools\FileStorageService;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -94,5 +96,41 @@ class FileStorageServiceTest extends TestCase
         $this->expectException(LocalFileNotFoundException::class);
 
         $this->instance->uploadFile('/tmp/test-directory', 'file.txt');
+    }
+
+    public function testUploadFile_FileCouldNotBeOpened(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('uploadFile')
+            ->with('/tmp/test-directory', 'file.txt')
+            ->willThrowException(new FileCouldNotBeOpenedException());
+
+        $this->expectException(FileCouldNotBeOpenedException::class);
+
+        $this->instance->uploadFile('/tmp/test-directory', 'file.txt');
+    }
+
+    public function testDeleteFile(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('deleteFile')
+            ->with('/tmp/test-directory', 'file.txt');
+
+        $this->instance->deleteFile('/tmp/test-directory', 'file.txt');
+    }
+
+    public function testDeleteFile_RemoteFileDoesntExist(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('deleteFile')
+            ->with('/tmp/test-directory', 'file.txt')
+            ->willThrowException(new RemoteFileDoesntExistException());
+
+        $this->expectException(RemoteFileDoesntExistException::class);
+
+        $this->instance->deleteFile('/tmp/test-directory', 'file.txt');
     }
 }

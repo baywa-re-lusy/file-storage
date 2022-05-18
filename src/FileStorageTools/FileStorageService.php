@@ -14,7 +14,9 @@
 namespace BayWaReLusy\FileStorageTools;
 
 use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
+use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
+use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
 
 /**
  * Class FileStorageService
@@ -71,9 +73,21 @@ class FileStorageService
      * @param string $pathToFile Path and name of the file to upload
      * @return void
      * @throws LocalFileNotFoundException
+     * @throws FileCouldNotBeOpenedException
      */
     public function uploadFile(string $directory, string $pathToFile): void
     {
         $this->getAdapter()->uploadFile($directory, $pathToFile);
+    }
+
+    /**
+     * @param string $directory
+     * @param string $pathToFile
+     * @return void
+     * @throws RemoteFileDoesntExistException
+     */
+    public function deleteFile(string $directory, string $pathToFile): void
+    {
+        $this->getAdapter()->deleteFile($directory, $pathToFile);
     }
 }

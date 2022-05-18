@@ -14,6 +14,7 @@
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
@@ -68,8 +69,12 @@ class AzureAdapter implements FileStorageAdapterInterface
     public function uploadFile(string $directory, string $pathToFile): void
     {
         // Check first if local file exists and can be opened
-        if (!file_exists($pathToFile) || !$filePointer = fopen($pathToFile, 'r')) {
-            throw new LocalFileNotFoundException("File not found or file could'nt be opened.");
+        if (!file_exists($pathToFile)) {
+            throw new LocalFileNotFoundException("File not found.");
+        }
+
+        if (!$filePointer = fopen($pathToFile, 'r')) {
+            throw new FileCouldNotBeOpenedException("File couldn't be opened.");
         }
 
         // Calculate filesize to determine the number of chunks to be uploaded. Azure is limited to 4MB per chunk.
@@ -87,10 +92,18 @@ class AzureAdapter implements FileStorageAdapterInterface
                 $this->fileShare,
                 $pathToFile,
                 $filePointer,
-                new Range($currentPosition, min($currentPosition + 4095, $filesize - 1))
+                new Range($currentPosition, min($currentPosition + (4096 * 4096 - 1), $filesize - 1))
             );
 
-            $currentPosition += 4096;
+            $currentPosition += 4096 * 4096;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteFile(string $pathToFile): void
+    {
+        $this->fileStorageClient->deleteFile($this->fileShare, ltrim($pathToFile, '/'));
     }
 }
