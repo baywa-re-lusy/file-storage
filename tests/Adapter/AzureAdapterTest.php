@@ -29,7 +29,7 @@ class AzureAdapterTest extends TestCase
         );
     }
 
-    protected function dataProvider_testCreateDirectory(): array
+    public function dataProvider_testCreateDirectory(): array
     {
         return
             [
@@ -183,7 +183,7 @@ class AzureAdapterTest extends TestCase
         $mockFopen->disable();
     }
 
-    protected function dataProvider_testDeleteFile(): array
+    public function dataProvider_testDeleteFile(): array
     {
         return
             [
