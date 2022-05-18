@@ -14,6 +14,7 @@
 namespace BayWaReLusy\FileStorageTools;
 
 use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
+use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 
 /**
  * Class FileStorageService
@@ -61,5 +62,18 @@ class FileStorageService
     public function createDirectory(string $path): void
     {
         $this->getAdapter()->createDirectory($path);
+    }
+
+    /**
+     * Upload a file to an existing directory.
+     *
+     * @param string $directory Existing remote directory
+     * @param string $pathToFile Path and name of the file to upload
+     * @return void
+     * @throws LocalFileNotFoundException
+     */
+    public function uploadFile(string $directory, string $pathToFile): void
+    {
+        $this->getAdapter()->uploadFile($directory, $pathToFile);
     }
 }

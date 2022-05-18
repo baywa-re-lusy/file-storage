@@ -25,14 +25,24 @@ class AzureAdapterTest extends TestCase
         );
     }
 
-    public function testCreateDirectory(): void
+    protected function dataProvider_testCreateDirectory(): array
+    {
+        return
+            [
+                ['/test-directory'],
+                ['test-directory'],
+            ];
+    }
+
+    /** @dataProvider dataProvider_testCreateDirectory */
+    public function testCreateDirectory(string $directory): void
     {
         $this->fileStorageClientMock
             ->expects($this->once())
             ->method('createDirectory')
-            ->with('file-share', '/test-directory');
+            ->with('file-share', 'test-directory');
 
-        $this->instance->createDirectory('/test-directory');
+        $this->instance->createDirectory($directory);
     }
 
     public function testCreateDirectory_DirectoryAlreadyExists(): void
@@ -40,12 +50,12 @@ class AzureAdapterTest extends TestCase
         $this->fileStorageClientMock
             ->expects($this->once())
             ->method('createDirectory')
-            ->with('file-share', '/test-directory')
+            ->with('file-share', 'test-directory')
             ->will($this->throwException(new DirectoryAlreadyExistsException()));
 
         $this->expectException(DirectoryAlreadyExistsException::class);
 
-        $this->instance->createDirectory('/test-directory');
+        $this->instance->createDirectory('test-directory');
     }
 
     public function testCreateDirectory_ParentNotFound(): void
@@ -53,12 +63,12 @@ class AzureAdapterTest extends TestCase
         $this->fileStorageClientMock
             ->expects($this->once())
             ->method('createDirectory')
-            ->with('file-share', '/parent-directory/sub-directory')
+            ->with('file-share', 'parent-directory/sub-directory')
             ->will($this->throwException(new ParentNotFoundException()));
 
         $this->expectException(ParentNotFoundException::class);
 
-        $this->instance->createDirectory('/parent-directory/sub-directory');
+        $this->instance->createDirectory('parent-directory/sub-directory');
     }
 
     public function testCreateDirectory_UnknownError(): void
@@ -66,11 +76,11 @@ class AzureAdapterTest extends TestCase
         $this->fileStorageClientMock
             ->expects($this->once())
             ->method('createDirectory')
-            ->with('file-share', '/test-directory')
+            ->with('file-share', 'test-directory')
             ->will($this->throwException(new UnknownErrorException()));
 
         $this->expectException(UnknownErrorException::class);
 
-        $this->instance->createDirectory('/test-directory');
+        $this->instance->createDirectory('test-directory');
     }
 }

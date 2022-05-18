@@ -14,10 +14,13 @@
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
+use MicrosoftAzure\Storage\Common\Models\Range;
 use MicrosoftAzure\Storage\File\FileRestProxy as FileStorageClient;
+use MicrosoftAzure\Storage\File\Models\CreateFileOptions;
 
 /**
  * AzureAdapter
@@ -47,7 +50,7 @@ class AzureAdapter implements FileStorageAdapterInterface
     public function createDirectory(string $path): void
     {
         try {
-            $this->fileStorageClient->createDirectory($this->fileShare, $path);
+            $this->fileStorageClient->createDirectory($this->fileShare, ltrim($path, '/'));
         } catch (ServiceException $e) {
             if (str_contains($e->getMessage(), '<Code>ResourceAlreadyExists</Code>')) {
                 throw new DirectoryAlreadyExistsException(sprintf("The directory '%s' already exists.", $path));
@@ -56,6 +59,38 @@ class AzureAdapter implements FileStorageAdapterInterface
             }
 
             throw new UnknownErrorException('Unknown File Storage error');
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function uploadFile(string $directory, string $pathToFile): void
+    {
+        // Check first if local file exists and can be opened
+        if (!file_exists($pathToFile) || !$filePointer = fopen($pathToFile, 'r')) {
+            throw new LocalFileNotFoundException("File not found or file could'nt be opened.");
+        }
+
+        // Calculate filesize to determine the number of chunks to be uploaded. Azure is limited to 4MB per chunk.
+        $filesize        = (int)filesize($pathToFile);
+        $currentPosition = 0;
+
+        // Create the empty file first
+        $createFileOptions = new CreateFileOptions();
+        $createFileOptions->setContentLength($filesize);
+        $this->fileStorageClient->createFile($this->fileShare, $pathToFile, $filesize, $createFileOptions);
+
+        // Upload chunks of maximum 4MB
+        while ($currentPosition < $filesize) {
+            $this->fileStorageClient->putFileRange(
+                $this->fileShare,
+                $pathToFile,
+                $filePointer,
+                new Range($currentPosition, min($currentPosition + 4095, $filesize - 1))
+            );
+
+            $currentPosition += 4096;
         }
     }
 }

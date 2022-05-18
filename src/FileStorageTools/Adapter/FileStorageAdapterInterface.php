@@ -14,6 +14,7 @@
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 
@@ -30,11 +31,26 @@ use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 interface FileStorageAdapterInterface
 {
     /**
-     * @param string $path
+     * Create a new directory. Examples:
+     *   - test
+     *   - test1/test2
+     *   - ..
+     *
+     * @param string $path Path of the directory to create
      * @return void
      * @throws DirectoryAlreadyExistsException
      * @throws ParentNotFoundException
      * @throws UnknownErrorException
      */
     public function createDirectory(string $path): void;
+
+    /**
+     * Upload a file to an existing directory.
+     *
+     * @param string $directory Existing remote directory
+     * @param string $pathToFile Path and name of the file to upload
+     * @return void
+     * @throws LocalFileNotFoundException
+     */
+    public function uploadFile(string $directory, string $pathToFile): void;
 }

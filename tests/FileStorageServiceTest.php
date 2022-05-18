@@ -4,6 +4,7 @@ namespace BayWaReLusy\FileStorageTools\Test;
 
 use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 use BayWaReLusy\FileStorageTools\FileStorageService;
@@ -70,5 +71,28 @@ class FileStorageServiceTest extends TestCase
         $this->expectException(UnknownErrorException::class);
 
         $this->instance->createDirectory('/test-directory');
+    }
+
+    public function testUploadFile(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('uploadFile')
+            ->with('/tmp/test-directory', 'file.txt');
+
+        $this->instance->uploadFile('/tmp/test-directory', 'file.txt');
+    }
+
+    public function testUploadFile_LocalFileNotFound(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('uploadFile')
+            ->with('/tmp/test-directory', 'file.txt')
+            ->willThrowException(new LocalFileNotFoundException());
+
+        $this->expectException(LocalFileNotFoundException::class);
+
+        $this->instance->uploadFile('/tmp/test-directory', 'file.txt');
     }
 }
