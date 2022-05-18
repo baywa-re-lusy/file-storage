@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         forceCoversAnnotation="false"
+         processIsolation="false"
+         stopOnError="false"
+         stopOnFailure="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         verbose="true"
+>
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">src/Migrations</directory>
+        </exclude>
+    </coverage>
+    <testsuites>
+        <testsuite name="BayWa r.e. File Storage Tools Unit Tests">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

@@ -1,5 +1,7 @@
 <?php
 
+use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
+use BayWaReLusy\FileStorageTools\Adapter\AzureAdapterFactory;
 use BayWaReLusy\FileStorageTools\FileStorageService;
 
 return [
@@ -11,7 +13,7 @@ return [
                 ],
             'factories' =>
                 [
-                    //AwsSqsAdapter::class => AwsSqsAdapterFactory::class,
+                    AzureAdapter::class => AzureAdapterFactory::class
                 ],
             'abstract_factories' =>
                 [
