@@ -14,6 +14,7 @@ use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 use BayWaReLusy\FileStorageTools\FileStorageService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class FileStorageServiceTest extends TestCase
 {
@@ -38,41 +39,31 @@ class FileStorageServiceTest extends TestCase
         $this->instance->createDirectory('/test-directory');
     }
 
-    public function testCreateDirectory_DirectoryAlreadyExists(): void
+    public function dataProvider_testCreateDirectory_Exceptions(): array
     {
+        return
+            [
+                [DirectoryAlreadyExistsException::class],
+                [ParentNotFoundException::class],
+                [UnknownErrorException::class],
+            ];
+    }
+
+    /**
+     * @dataProvider dataProvider_testCreateDirectory_Exceptions
+     */
+    public function testCreateDirectory_Exceptions(string $exceptionClassName): void
+    {
+        /** @var Throwable $exception */
+        $exception = new $exceptionClassName();
+
         $this->adapterMock
             ->expects($this->once())
             ->method('createDirectory')
             ->with('/test-directory')
-            ->will($this->throwException(new DirectoryAlreadyExistsException()));
+            ->will($this->throwException($exception));
 
-        $this->expectException(DirectoryAlreadyExistsException::class);
-
-        $this->instance->createDirectory('/test-directory');
-    }
-
-    public function testCreateDirectory_ParentNotFound(): void
-    {
-        $this->adapterMock
-            ->expects($this->once())
-            ->method('createDirectory')
-            ->with('/parent-directory/sub-directory')
-            ->will($this->throwException(new ParentNotFoundException()));
-
-        $this->expectException(ParentNotFoundException::class);
-
-        $this->instance->createDirectory('/parent-directory/sub-directory');
-    }
-
-    public function testCreateDirectory_UnknownError(): void
-    {
-        $this->adapterMock
-            ->expects($this->once())
-            ->method('createDirectory')
-            ->with('/test-directory')
-            ->will($this->throwException(new UnknownErrorException()));
-
-        $this->expectException(UnknownErrorException::class);
+        $this->expectException($exceptionClassName);
 
         $this->instance->createDirectory('/test-directory');
     }
@@ -87,41 +78,31 @@ class FileStorageServiceTest extends TestCase
         $this->instance->deleteDirectory('/test-directory');
     }
 
-    public function testDeleteDirectory_DirectoryDoesntExist(): void
+    public function dataProvider_testDeleteDirectory_Exceptions(): array
     {
-        $this->adapterMock
-            ->expects($this->once())
-            ->method('deleteDirectory')
-            ->with('/test-directory')
-            ->will($this->throwException(new DirectoryDoesntExistsException()));
-
-        $this->expectException(DirectoryDoesntExistsException::class);
-
-        $this->instance->deleteDirectory('/test-directory');
+        return
+            [
+                [DirectoryDoesntExistsException::class],
+                [DirectoryNotEmptyException::class],
+                [UnknownErrorException::class],
+            ];
     }
 
-    public function testDeleteDirectory_DirectoryNotEmpty(): void
+    /**
+     * @dataProvider dataProvider_testDeleteDirectory_Exceptions
+     */
+    public function testDeleteDirectory_Exceptions(string $exceptionClassName): void
     {
+        /** @var Throwable $exception */
+        $exception = new $exceptionClassName();
+
         $this->adapterMock
             ->expects($this->once())
             ->method('deleteDirectory')
             ->with('/test-directory')
-            ->will($this->throwException(new DirectoryNotEmptyException()));
+            ->will($this->throwException($exception));
 
-        $this->expectException(DirectoryNotEmptyException::class);
-
-        $this->instance->deleteDirectory('/test-directory');
-    }
-
-    public function testDeleteDirectory_UnknownError(): void
-    {
-        $this->adapterMock
-            ->expects($this->once())
-            ->method('deleteDirectory')
-            ->with('/test-directory')
-            ->will($this->throwException(new UnknownErrorException()));
-
-        $this->expectException(UnknownErrorException::class);
+        $this->expectException($exceptionClassName);
 
         $this->instance->deleteDirectory('/test-directory');
     }
