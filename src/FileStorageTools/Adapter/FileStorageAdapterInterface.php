@@ -63,6 +63,7 @@ interface FileStorageAdapterInterface
      * @param string $pathToFile Path and name of the file to delete
      * @return void
      * @throws RemoteFileDoesntExistException
+     * @throws UnknownErrorException
      */
     public function deleteFile(string $pathToFile): void;
 }

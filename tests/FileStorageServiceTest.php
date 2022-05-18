@@ -116,9 +116,9 @@ class FileStorageServiceTest extends TestCase
         $this->adapterMock
             ->expects($this->once())
             ->method('deleteFile')
-            ->with('/tmp/test-directory', 'file.txt');
+            ->with('/tmp/test-directory/file.txt');
 
-        $this->instance->deleteFile('/tmp/test-directory', 'file.txt');
+        $this->instance->deleteFile('/tmp/test-directory/file.txt');
     }
 
     public function testDeleteFile_RemoteFileDoesntExist(): void
@@ -126,11 +126,24 @@ class FileStorageServiceTest extends TestCase
         $this->adapterMock
             ->expects($this->once())
             ->method('deleteFile')
-            ->with('/tmp/test-directory', 'file.txt')
+            ->with('/tmp/test-directory/file.txt')
             ->willThrowException(new RemoteFileDoesntExistException());
 
         $this->expectException(RemoteFileDoesntExistException::class);
 
-        $this->instance->deleteFile('/tmp/test-directory', 'file.txt');
+        $this->instance->deleteFile('/tmp/test-directory/file.txt');
+    }
+
+    public function testDeleteFile_UnknownError(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('deleteFile')
+            ->with('/tmp/test-directory/file.txt')
+            ->willThrowException(new UnknownErrorException());
+
+        $this->expectException(UnknownErrorException::class);
+
+        $this->instance->deleteFile('/tmp/test-directory/file.txt');
     }
 }

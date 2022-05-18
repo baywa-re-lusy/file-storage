@@ -17,6 +17,7 @@ use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
 use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
+use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 use MicrosoftAzure\Storage\Common\Models\Range;
@@ -104,6 +105,14 @@ class AzureAdapter implements FileStorageAdapterInterface
      */
     public function deleteFile(string $pathToFile): void
     {
-        $this->fileStorageClient->deleteFile($this->fileShare, ltrim($pathToFile, '/'));
+        try {
+            $this->fileStorageClient->deleteFile($this->fileShare, ltrim($pathToFile, '/'));
+        } catch (ServiceException $e) {
+            if (str_contains($e->getMessage(), '<Code>ResourceNotFound</Code>')) {
+                throw new RemoteFileDoesntExistException(sprintf("The file '%s' couldn't be found.", $pathToFile));
+            }
+
+            throw new UnknownErrorException('Unknown File Storage error');
+        }
     }
 }

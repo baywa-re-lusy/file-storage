@@ -17,6 +17,7 @@ use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
 use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
+use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 
 /**
  * Class FileStorageService
@@ -81,13 +82,13 @@ class FileStorageService
     }
 
     /**
-     * @param string $directory
      * @param string $pathToFile
      * @return void
      * @throws RemoteFileDoesntExistException
+     * @throws UnknownErrorException
      */
-    public function deleteFile(string $directory, string $pathToFile): void
+    public function deleteFile(string $pathToFile): void
     {
-        $this->getAdapter()->deleteFile($directory, $pathToFile);
+        $this->getAdapter()->deleteFile($pathToFile);
     }
 }

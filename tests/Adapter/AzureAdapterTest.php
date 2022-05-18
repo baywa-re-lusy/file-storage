@@ -5,6 +5,7 @@ namespace BayWaReLusy\FileStorageTools\Test\Adapter;
 use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
+use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 use MicrosoftAzure\Storage\Common\Models\Range;
 use phpmock\functions\FixedValueFunction;
@@ -200,5 +201,31 @@ class AzureAdapterTest extends TestCase
             ->with('file-share', 'dir/test.txt');
 
         $this->instance->deleteFile($file);
+    }
+
+    public function testDeleteFile_RemoteFileDoesntExist(): void
+    {
+        $this->fileStorageClientMock
+            ->expects($this->once())
+            ->method('deleteFile')
+            ->with('file-share', 'dir/test.txt')
+            ->will($this->throwException(new RemoteFileDoesntExistException()));
+
+        $this->expectException(RemoteFileDoesntExistException::class);
+
+        $this->instance->deleteFile('dir/test.txt');
+    }
+
+    public function testDeleteFile_UnknownError(): void
+    {
+        $this->fileStorageClientMock
+            ->expects($this->once())
+            ->method('deleteFile')
+            ->with('file-share', 'dir/test.txt')
+            ->will($this->throwException(new UnknownErrorException()));
+
+        $this->expectException(UnknownErrorException::class);
+
+        $this->instance->deleteFile('dir/test.txt');
     }
 }
