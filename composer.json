@@ -23,7 +23,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "BayWaReLusy\\FileStorageTools\\Test": "tests"
+            "BayWaReLusy\\FileStorageTools\\Test\\": "tests"
         }
     }
 }
