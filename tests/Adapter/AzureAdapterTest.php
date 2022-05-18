@@ -49,41 +49,26 @@ class AzureAdapterTest extends TestCase
         $this->instance->createDirectory($directory);
     }
 
-    public function testCreateDirectory_DirectoryAlreadyExists(): void
+    public function dataProvider_testCreateDirectory_Exceptions(): array
+    {
+        return
+            [
+                [DirectoryAlreadyExistsException::class],
+                [ParentNotFoundException::class],
+                [UnknownErrorException::class],
+            ];
+    }
+
+    /** @dataProvider dataProvider_testCreateDirectory_Exceptions */
+    public function testCreateDirectory_Exceptions(string $exceptionClassName): void
     {
         $this->fileStorageClientMock
             ->expects($this->once())
             ->method('createDirectory')
             ->with('file-share', 'test-directory')
-            ->will($this->throwException(new DirectoryAlreadyExistsException()));
+            ->will($this->throwException(new $exceptionClassName()));
 
-        $this->expectException(DirectoryAlreadyExistsException::class);
-
-        $this->instance->createDirectory('test-directory');
-    }
-
-    public function testCreateDirectory_ParentNotFound(): void
-    {
-        $this->fileStorageClientMock
-            ->expects($this->once())
-            ->method('createDirectory')
-            ->with('file-share', 'parent-directory/sub-directory')
-            ->will($this->throwException(new ParentNotFoundException()));
-
-        $this->expectException(ParentNotFoundException::class);
-
-        $this->instance->createDirectory('parent-directory/sub-directory');
-    }
-
-    public function testCreateDirectory_UnknownError(): void
-    {
-        $this->fileStorageClientMock
-            ->expects($this->once())
-            ->method('createDirectory')
-            ->with('file-share', 'test-directory')
-            ->will($this->throwException(new UnknownErrorException()));
-
-        $this->expectException(UnknownErrorException::class);
+        $this->expectException($exceptionClassName);
 
         $this->instance->createDirectory('test-directory');
     }
@@ -203,28 +188,25 @@ class AzureAdapterTest extends TestCase
         $this->instance->deleteFile($file);
     }
 
-    public function testDeleteFile_RemoteFileDoesntExist(): void
+    public function dataProvider_testDeleteFile_Exceptions(): array
     {
-        $this->fileStorageClientMock
-            ->expects($this->once())
-            ->method('deleteFile')
-            ->with('file-share', 'dir/test.txt')
-            ->will($this->throwException(new RemoteFileDoesntExistException()));
-
-        $this->expectException(RemoteFileDoesntExistException::class);
-
-        $this->instance->deleteFile('dir/test.txt');
+        return
+            [
+                [RemoteFileDoesntExistException::class],
+                [UnknownErrorException::class],
+            ];
     }
 
-    public function testDeleteFile_UnknownError(): void
+    /** @dataProvider dataProvider_testDeleteFile_Exceptions */
+    public function testDeleteFile_Exceptions(string $exceptionClassName): void
     {
         $this->fileStorageClientMock
             ->expects($this->once())
             ->method('deleteFile')
             ->with('file-share', 'dir/test.txt')
-            ->will($this->throwException(new UnknownErrorException()));
+            ->will($this->throwException(new $exceptionClassName()));
 
-        $this->expectException(UnknownErrorException::class);
+        $this->expectException($exceptionClassName);
 
         $this->instance->deleteFile('dir/test.txt');
     }
