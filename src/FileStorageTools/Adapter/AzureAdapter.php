@@ -14,6 +14,8 @@
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryNotEmptyException;
 use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
@@ -58,6 +60,24 @@ class AzureAdapter implements FileStorageAdapterInterface
                 throw new DirectoryAlreadyExistsException(sprintf("The directory '%s' already exists.", $path));
             } elseif (str_contains($e->getMessage(), '<Code>ParentNotFound</Code>')) {
                 throw new ParentNotFoundException("The parent of the directory you want to create doesn't exist.");
+            }
+
+            throw new UnknownErrorException('Unknown File Storage error');
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteDirectory(string $path): void
+    {
+        try {
+            $this->fileStorageClient->deleteDirectory($this->fileShare, ltrim($path, '/'));
+        } catch (ServiceException $e) {
+            if (str_contains($e->getMessage(), '<Code>ResourceNotFound</Code>')) {
+                throw new DirectoryDoesntExistsException(sprintf("The directory '%s' doesn't exist.", $path));
+            } elseif (str_contains($e->getMessage(), '<Code>DirectoryNotEmpty</Code>')) {
+                throw new DirectoryNotEmptyException(sprintf("The directory '%s' isn't empty.", $path));
             }
 
             throw new UnknownErrorException('Unknown File Storage error');

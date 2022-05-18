@@ -14,6 +14,8 @@
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryNotEmptyException;
 use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
@@ -45,6 +47,20 @@ interface FileStorageAdapterInterface
      * @throws UnknownErrorException
      */
     public function createDirectory(string $path): void;
+
+    /**
+     * Delete a directory. Examples:
+     *   - test
+     *   - test1/test2
+     *   - ..
+     *
+     * @param string $path Path of the directory to delete
+     * @return void
+     * @throws DirectoryDoesntExistsException
+     * @throws DirectoryNotEmptyException
+     * @throws UnknownErrorException
+     */
+    public function deleteDirectory(string $path): void;
 
     /**
      * Upload a file to an existing directory.

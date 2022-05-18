@@ -4,6 +4,8 @@ namespace BayWaReLusy\FileStorageTools\Test;
 
 use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryNotEmptyException;
 use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
@@ -73,6 +75,55 @@ class FileStorageServiceTest extends TestCase
         $this->expectException(UnknownErrorException::class);
 
         $this->instance->createDirectory('/test-directory');
+    }
+
+    public function testDeleteDirectory(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('deleteDirectory')
+            ->with('/test-directory');
+
+        $this->instance->deleteDirectory('/test-directory');
+    }
+
+    public function testDeleteDirectory_DirectoryDoesntExist(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('deleteDirectory')
+            ->with('/test-directory')
+            ->will($this->throwException(new DirectoryDoesntExistsException()));
+
+        $this->expectException(DirectoryDoesntExistsException::class);
+
+        $this->instance->deleteDirectory('/test-directory');
+    }
+
+    public function testDeleteDirectory_DirectoryNotEmpty(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('deleteDirectory')
+            ->with('/test-directory')
+            ->will($this->throwException(new DirectoryNotEmptyException()));
+
+        $this->expectException(DirectoryNotEmptyException::class);
+
+        $this->instance->deleteDirectory('/test-directory');
+    }
+
+    public function testDeleteDirectory_UnknownError(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('deleteDirectory')
+            ->with('/test-directory')
+            ->will($this->throwException(new UnknownErrorException()));
+
+        $this->expectException(UnknownErrorException::class);
+
+        $this->instance->deleteDirectory('/test-directory');
     }
 
     public function testUploadFile(): void

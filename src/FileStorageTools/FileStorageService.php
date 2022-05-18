@@ -14,8 +14,12 @@
 namespace BayWaReLusy\FileStorageTools;
 
 use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryNotEmptyException;
 use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
+use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 
@@ -58,13 +62,25 @@ class FileStorageService
     /**
      * @param string $path
      * @return void
-     * @throws Exception\DirectoryAlreadyExistsException
-     * @throws Exception\ParentNotFoundException
-     * @throws Exception\UnknownErrorException
+     * @throws DirectoryAlreadyExistsException
+     * @throws ParentNotFoundException
+     * @throws UnknownErrorException
      */
     public function createDirectory(string $path): void
     {
         $this->getAdapter()->createDirectory($path);
+    }
+
+    /**
+     * @param string $path
+     * @return void
+     * @throws DirectoryDoesntExistsException
+     * @throws DirectoryNotEmptyException
+     * @throws UnknownErrorException
+     */
+    public function deleteDirectory(string $path): void
+    {
+        $this->getAdapter()->deleteDirectory($path);
     }
 
     /**
