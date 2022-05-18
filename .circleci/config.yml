@@ -16,7 +16,7 @@ jobs:
       - checkout
       - run:
           name: Composer install
-          command: ./composer.phar install -n
+          command: ./composer.phar update -n
       - persist_to_workspace:
           root: /var/www/html
           paths:
