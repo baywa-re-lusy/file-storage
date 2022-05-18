@@ -1,18 +1,5 @@
 version: 2.1
 
-composer_install: &composer_install
-  name: Composer install
-  command: ./composer.phar install -n
-
-composer_save_cache: &composer_save_cache
-  key: composer-cache-{{ checksum "composer.lock" }}
-  paths:
-    - vendor
-
-composer_restore_cache: &composer_restore_cache
-  keys:
-    - composer-cache-{{ checksum "composer.lock" }}
-
 jobs:
   build:
     docker:
@@ -27,12 +14,9 @@ jobs:
           name: Set git safe directory
           command: git config --global --add safe.directory /var/www/html
       - checkout
-      - restore_cache:
-          <<: *composer_restore_cache
       - run:
-          <<: *composer_install
-      - save_cache:
-          <<: *composer_save_cache
+          name: Composer install
+          command: ./composer.phar install -n
       - persist_to_workspace:
           root: /var/www/html
           paths:
