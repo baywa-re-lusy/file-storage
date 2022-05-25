@@ -151,8 +151,8 @@ class AzureAdapter implements FileStorageAdapterInterface
 
             // Optionally, include the directories
             if ($includeDirectories) {
-                foreach ($response->getDirectories() as $directory) {
-                    $result[] = $directory->getName();
+                foreach ($response->getDirectories() as $dir) {
+                    $result[] = $dir->getName();
                 }
             }
 

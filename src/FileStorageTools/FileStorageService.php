@@ -115,7 +115,7 @@ class FileStorageService
      *
      * @param string $directory
      * @param bool $includeDirectories If true, directories are included in the result
-     * @return array
+     * @return string[]
      * @throws DirectoryDoesntExistsException
      * @throws UnknownErrorException
      */
