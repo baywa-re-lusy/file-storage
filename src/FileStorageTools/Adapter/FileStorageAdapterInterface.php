@@ -82,4 +82,20 @@ interface FileStorageAdapterInterface
      * @throws UnknownErrorException
      */
     public function deleteFile(string $pathToFile): void;
+
+    /**
+     * List the files in the given directory.
+     *
+     * @param string $directory The directory to list
+     * @return string[] List of files in the given directory
+     */
+    public function listFilesInDirectory(string $directory): array;
+
+    /**
+     * Get the publicly accessible URL of the given file.
+     *
+     * @param string $pathToFile Path to the file to list
+     * @return string Publicly accessible URL of the given file
+     */
+    public function getPublicFileUrl(string $pathToFile): string;
 }

@@ -210,4 +210,5 @@ class AzureAdapterTest extends TestCase
 
         $this->instance->deleteFile('dir/test.txt');
     }
+
 }

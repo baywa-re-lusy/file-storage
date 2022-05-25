@@ -49,7 +49,7 @@ data "azurerm_storage_account_sas" "sas" {
 
   resource_types {
     service   = true
-    container = false
+    container = true
     object    = true
   }
 
@@ -101,7 +101,7 @@ use BayWaReLusy\FileStorageTools\Adapter\AwsSqsAdapter;
 $fileStorageToolsConfig = new FileStorageToolsConfig($azureSasConnectionString, $azureFileShareName);
 $fileStorageTools       = new FileStorageTools($fileStorageToolsConfig);
 $fileStorageService     = $fileStorageTools->get(FileStorageService::class);
-$fileStorageService->setAdapter($emailTools->get(AzureFileStorageAdapter::class));
+$fileStorageService->setAdapter($fileStorageTools->get(AzureFileStorageAdapter::class));
 ```
 
 Optionally, you can include then the FileStorage Client into your Service Manager:

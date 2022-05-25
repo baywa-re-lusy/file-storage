@@ -49,7 +49,7 @@ class AzureAdapter implements FileStorageAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function createDirectory(string $path): void
     {
@@ -67,7 +67,7 @@ class AzureAdapter implements FileStorageAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteDirectory(string $path): void
     {
@@ -85,7 +85,7 @@ class AzureAdapter implements FileStorageAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function uploadFile(string $directory, string $pathToFile): void
     {
@@ -121,7 +121,7 @@ class AzureAdapter implements FileStorageAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteFile(string $pathToFile): void
     {
@@ -134,5 +134,36 @@ class AzureAdapter implements FileStorageAdapterInterface
 
             throw new UnknownErrorException('Unknown File Storage error');
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array
+    {
+        $result   = [];
+        $response = $this->fileStorageClient->listDirectoriesAndFiles($this->fileShare, ltrim($directory, '/'));
+
+        // Optionally, include the directories
+        if ($includeDirectories) {
+            foreach ($response->getDirectories() as $directory) {
+                $result[] = $directory->getName();
+            }
+        }
+
+        // Add the files
+        foreach ($response->getFiles() as $file) {
+            $result[] = $file->getName();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPublicFileUrl(string $pathToFile): string
+    {
+        return '';
     }
 }
