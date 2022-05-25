@@ -172,4 +172,70 @@ class FileStorageServiceTest extends TestCase
 
         $this->instance->deleteFile('/tmp/test-directory/file.txt');
     }
+
+    public function testListFilesInDirectory(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('listFilesInDirectory')
+            ->with('/tmp/test-directory', true);
+
+        $this->instance->listFilesInDirectory('/tmp/test-directory');
+    }
+
+    public function dataProvider_testListFilesInDirectory_Exceptions(): array
+    {
+        return
+            [
+                [DirectoryDoesntExistsException::class],
+                [UnknownErrorException::class],
+            ];
+    }
+
+    /** @dataProvider dataProvider_testListFilesInDirectory_Exceptions */
+    public function testListFilesInDirectory_Exceptions($exceptionClassName): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('listFilesInDirectory')
+            ->with('/tmp/test-directory', true)
+            ->will($this->throwException(new $exceptionClassName()));
+
+        $this->expectException($exceptionClassName);
+
+        $this->instance->listFilesInDirectory('/tmp/test-directory');
+    }
+
+    public function testGetPublicFileUrl(): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('getPublicFileUrl')
+            ->with('file.jpg');
+
+        $this->instance->getPublicFileUrl('file.jpg');
+    }
+
+    public function dataProvider_testGetPublicFileUrl_Exceptions(): array
+    {
+        return
+            [
+                [RemoteFileDoesntExistException::class],
+                [UnknownErrorException::class],
+            ];
+    }
+
+    /** @dataProvider dataProvider_testGetPublicFileUrl_Exceptions */
+    public function testGetPublicFileUrl_Exceptions(string $exceptionClassName): void
+    {
+        $this->adapterMock
+            ->expects($this->once())
+            ->method('getPublicFileUrl')
+            ->with('file.jpg')
+            ->will($this->throwException(new $exceptionClassName()));
+
+        $this->expectException($exceptionClassName);
+
+        $this->instance->getPublicFileUrl('file.jpg');
+    }
 }

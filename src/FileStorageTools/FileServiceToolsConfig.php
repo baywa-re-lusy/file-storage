@@ -26,11 +26,13 @@ namespace BayWaReLusy\FileStorageTools;
 class FileServiceToolsConfig
 {
     /**
-     * @param string $azureStorageConnectionString Connection string of the Azure storage account
+     * @param string $azureSharedAccessSignature Shared Access Signature
+     * @param string $azureStorageAccountName Name of the Storage account
      * @param string $azureFileShareName Name of the file share
      */
     public function __construct(
-        protected string $azureStorageConnectionString,
+        protected string $azureSharedAccessSignature,
+        protected string $azureStorageAccountName,
         protected string $azureFileShareName
     ) {
     }
@@ -38,9 +40,17 @@ class FileServiceToolsConfig
     /**
      * @return string
      */
-    public function getAzureStorageConnectionString(): string
+    public function getAzureSharedAccessSignature(): string
     {
-        return $this->azureStorageConnectionString;
+        return $this->azureSharedAccessSignature;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAzureStorageAccountName(): string
+    {
+        return $this->azureStorageAccountName;
     }
 
     /**

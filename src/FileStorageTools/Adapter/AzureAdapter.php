@@ -41,10 +41,14 @@ class AzureAdapter implements FileStorageAdapterInterface
      * AzureAdapter constructor.
      * @param FileStorageClient $fileStorageClient
      * @param string $fileShare
+     * @param string $sharedAccessSignature
+     * @param string $storageAccountName
      */
     public function __construct(
         protected FileStorageClient $fileStorageClient,
-        protected string $fileShare
+        protected string $fileShare,
+        protected string $sharedAccessSignature,
+        protected string $storageAccountName
     ) {
     }
 
@@ -172,6 +176,21 @@ class AzureAdapter implements FileStorageAdapterInterface
      */
     public function getPublicFileUrl(string $pathToFile): string
     {
-        return '';
+        try {
+            @$this->fileStorageClient->getFile($this->fileShare, ltrim($pathToFile, '/'));
+        } catch (ServiceException $e) {
+            if (str_contains($e->getMessage(), '<Code>ResourceNotFound</Code>')) {
+                throw new RemoteFileDoesntExistException(sprintf("The file '%s' doesn't exist.", $pathToFile));
+            }
+
+            throw new UnknownErrorException('Unknown File Storage error');
+        }
+
+        return sprintf(
+            "https://%s.file.core.windows.net/%s?SharedAccessSignature=%s",
+            $this->storageAccountName,
+            ltrim($pathToFile, '/'),
+            $this->sharedAccessSignature
+        );
     }
 }
