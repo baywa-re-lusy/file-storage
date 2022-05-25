@@ -96,6 +96,7 @@ interface FileStorageAdapterInterface
      *
      * @param string $pathToFile Path to the file to list
      * @return string Publicly accessible URL of the given file
+     * @throws DirectoryDoesntExistsException
      */
     public function getPublicFileUrl(string $pathToFile): string;
 }

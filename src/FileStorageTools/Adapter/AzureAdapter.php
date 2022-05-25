@@ -141,22 +141,30 @@ class AzureAdapter implements FileStorageAdapterInterface
      */
     public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array
     {
-        $result   = [];
-        $response = $this->fileStorageClient->listDirectoriesAndFiles($this->fileShare, ltrim($directory, '/'));
+        try {
+            $result   = [];
+            $response = $this->fileStorageClient->listDirectoriesAndFiles($this->fileShare, ltrim($directory, '/'));
 
-        // Optionally, include the directories
-        if ($includeDirectories) {
-            foreach ($response->getDirectories() as $directory) {
-                $result[] = $directory->getName();
+            // Optionally, include the directories
+            if ($includeDirectories) {
+                foreach ($response->getDirectories() as $directory) {
+                    $result[] = $directory->getName();
+                }
             }
-        }
 
-        // Add the files
-        foreach ($response->getFiles() as $file) {
-            $result[] = $file->getName();
-        }
+            // Add the files
+            foreach ($response->getFiles() as $file) {
+                $result[] = $file->getName();
+            }
 
-        return $result;
+            return $result;
+        } catch (ServiceException $e) {
+            if (str_contains($e->getMessage(), '<Code>ResourceNotFound</Code>')) {
+                throw new DirectoryDoesntExistsException(sprintf("The directory '%s' doesn't exist.", $directory));
+            }
+
+            throw new UnknownErrorException('Unknown File Storage error');
+        }
     }
 
     /**

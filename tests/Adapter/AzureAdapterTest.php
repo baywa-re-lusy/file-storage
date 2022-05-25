@@ -4,15 +4,20 @@ namespace BayWaReLusy\FileStorageTools\Test\Adapter;
 
 use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
+use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 use MicrosoftAzure\Storage\Common\Models\Range;
+use MicrosoftAzure\Storage\File\Models\Directory;
+use MicrosoftAzure\Storage\File\Models\File;
+use MicrosoftAzure\Storage\File\Models\ListDirectoriesAndFilesResult;
 use phpmock\functions\FixedValueFunction;
 use phpmock\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use MicrosoftAzure\Storage\File\FileRestProxy as FileStorageClient;
+use ReflectionClass;
 
 class AzureAdapterTest extends TestCase
 {
@@ -211,4 +216,88 @@ class AzureAdapterTest extends TestCase
         $this->instance->deleteFile('dir/test.txt');
     }
 
+    public function testListFilesInDirectory_IncludeDirectories(): void
+    {
+        $dir1 = new Directory();
+        $dir1->setName('dir1');
+        $dir2 = new Directory();
+        $dir2->setName('dir2');
+
+        $file1 = new File();
+        $file1->setName('file1.jpg');
+        $file2 = new File();
+        $file2->setName('file2.jpg');
+
+        $result         = new ListDirectoriesAndFilesResult();
+        $class          = new ReflectionClass(ListDirectoriesAndFilesResult::class);
+        $setDirectories = $class->getMethod('setDirectories');
+        $setDirectories->setAccessible(true);
+        $setDirectories->invoke($result, [$dir1, $dir2]);
+        $setFiles = $class->getMethod('setFiles');
+        $setFiles->setAccessible(true);
+        $setFiles->invoke($result, [$file1, $file2]);
+
+        $this->fileStorageClientMock
+            ->expects($this->once())
+            ->method('listDirectoriesAndFiles')
+            ->with('file-share', 'dirA/dirB')
+            ->will($this->returnValue($result));
+
+        $files = $this->instance->listFilesInDirectory('dirA/dirB');
+
+        $this->assertContains('dir1', $files);
+        $this->assertContains('dir2', $files);
+        $this->assertContains('file1.jpg', $files);
+        $this->assertContains('file2.jpg', $files);
+        $this->assertCount(4, $files);
+    }
+
+    public function testListFilesInDirectory_ExcludeDirectories(): void
+    {
+        $file1 = new File();
+        $file1->setName('file1.jpg');
+        $file2 = new File();
+        $file2->setName('file2.jpg');
+
+        $result         = new ListDirectoriesAndFilesResult();
+        $class          = new ReflectionClass(ListDirectoriesAndFilesResult::class);
+        $setFiles = $class->getMethod('setFiles');
+        $setFiles->setAccessible(true);
+        $setFiles->invoke($result, [$file1, $file2]);
+
+        $this->fileStorageClientMock
+            ->expects($this->once())
+            ->method('listDirectoriesAndFiles')
+            ->with('file-share', 'dirA/dirB')
+            ->will($this->returnValue($result));
+
+        $files = $this->instance->listFilesInDirectory('dirA/dirB', false);
+
+        $this->assertContains('file1.jpg', $files);
+        $this->assertContains('file2.jpg', $files);
+        $this->assertCount(2, $files);
+    }
+
+    public function dataProvider_testListFilesInDirectory_Exceptions(): array
+    {
+        return
+            [
+                [DirectoryDoesntExistsException::class],
+                [UnknownErrorException::class],
+            ];
+    }
+
+    /** @dataProvider dataProvider_testListFilesInDirectory_Exceptions */
+    public function testListFilesInDirectory_Exceptions(string $exceptionClassName): void
+    {
+        $this->fileStorageClientMock
+            ->expects($this->once())
+            ->method('listDirectoriesAndFiles')
+            ->with('file-share', 'dirA/dirB')
+            ->will($this->throwException(new $exceptionClassName()));
+
+        $this->expectException($exceptionClassName);
+
+        $this->instance->listFilesInDirectory('dirA/dirB', false);
+    }
 }
