@@ -41,15 +41,19 @@ class AzureAdapter implements FileStorageAdapterInterface
      * AzureAdapter constructor.
      * @param FileStorageClient $fileStorageClient
      * @param string $fileShare
+     * @param string $sharedAccessSignature
+     * @param string $storageAccountName
      */
     public function __construct(
         protected FileStorageClient $fileStorageClient,
-        protected string $fileShare
+        protected string $fileShare,
+        protected string $sharedAccessSignature,
+        protected string $storageAccountName
     ) {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function createDirectory(string $path): void
     {
@@ -67,7 +71,7 @@ class AzureAdapter implements FileStorageAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteDirectory(string $path): void
     {
@@ -85,7 +89,7 @@ class AzureAdapter implements FileStorageAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function uploadFile(string $directory, string $pathToFile): void
     {
@@ -121,7 +125,7 @@ class AzureAdapter implements FileStorageAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteFile(string $pathToFile): void
     {
@@ -134,5 +138,59 @@ class AzureAdapter implements FileStorageAdapterInterface
 
             throw new UnknownErrorException('Unknown File Storage error');
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array
+    {
+        try {
+            $result   = [];
+            $response = $this->fileStorageClient->listDirectoriesAndFiles($this->fileShare, ltrim($directory, '/'));
+
+            // Optionally, include the directories
+            if ($includeDirectories) {
+                foreach ($response->getDirectories() as $dir) {
+                    $result[] = $dir->getName();
+                }
+            }
+
+            // Add the files
+            foreach ($response->getFiles() as $file) {
+                $result[] = $file->getName();
+            }
+
+            return $result;
+        } catch (ServiceException $e) {
+            if (str_contains($e->getMessage(), '<Code>ResourceNotFound</Code>')) {
+                throw new DirectoryDoesntExistsException(sprintf("The directory '%s' doesn't exist.", $directory));
+            }
+
+            throw new UnknownErrorException('Unknown File Storage error');
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPublicFileUrl(string $pathToFile): string
+    {
+        try {
+            @$this->fileStorageClient->getFile($this->fileShare, ltrim($pathToFile, '/'));
+        } catch (ServiceException $e) {
+            if (str_contains($e->getMessage(), '<Code>ResourceNotFound</Code>')) {
+                throw new RemoteFileDoesntExistException(sprintf("The file '%s' doesn't exist.", $pathToFile));
+            }
+
+            throw new UnknownErrorException('Unknown File Storage error');
+        }
+
+        return sprintf(
+            "https://%s.file.core.windows.net/%s?SharedAccessSignature=%s",
+            $this->storageAccountName,
+            ltrim($pathToFile, '/'),
+            $this->sharedAccessSignature
+        );
     }
 }

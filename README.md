@@ -49,7 +49,7 @@ data "azurerm_storage_account_sas" "sas" {
 
   resource_types {
     service   = true
-    container = false
+    container = true
     object    = true
   }
 
@@ -77,15 +77,15 @@ data "azurerm_storage_account_sas" "sas" {
   }
 }
 
-output "file_storage_sas_connection_string" {
-  value = "FileEndpoint=https://${azurerm_storage_account.file_storage.name}.file.core.windows.net/;SharedAccessSignature=${data.azurerm_storage_account_sas.sas.sas}"
+output "azure_shared_access_signature" {
+  value = data.azurerm_storage_account_sas.sas.sas
   sensitive = true
 }
 ```
 
 Once the infrastructure is updated, retrieve the SAS Connection string with:
 ```shell
-terraform output file_storage_sas_connection_string
+terraform output azure_shared_access_signature
 ```
 
 ## Usage
@@ -98,10 +98,14 @@ use BayWaReLusy\FileStorageTools\FileStorageTools;
 use BayWaReLusy\FileStorageTools\FileStorageService;
 use BayWaReLusy\FileStorageTools\Adapter\AwsSqsAdapter;
 
-$fileStorageToolsConfig = new FileStorageToolsConfig($azureSasConnectionString, $azureFileShareName);
-$fileStorageTools       = new FileStorageTools($fileStorageToolsConfig);
-$fileStorageService     = $fileStorageTools->get(FileStorageService::class);
-$fileStorageService->setAdapter($emailTools->get(AzureFileStorageAdapter::class));
+$fileStorageToolsConfig = new FileStorageToolsConfig(
+    $azureSharedAccessSignature,
+    $azureStorageAccountName,
+    $azureFileShareName
+);
+$fileStorageTools   = new FileStorageTools($fileStorageToolsConfig);
+$fileStorageService = $fileStorageTools->get(FileStorageService::class);
+$fileStorageService->setAdapter($fileStorageTools->get(AzureFileStorageAdapter::class));
 ```
 
 Optionally, you can include then the FileStorage Client into your Service Manager:

@@ -35,8 +35,14 @@ class AzureAdapterFactory implements FactoryInterface
         $config = $container->get(FileServiceToolsConfig::class);
 
         return new AzureAdapter(
-            FileRestProxy::createFileService($config->getAzureStorageConnectionString()),
-            $config->getAzureFileShareName()
+            FileRestProxy::createFileService(sprintf(
+                "FileEndpoint=https://%s.file.core.windows.net/;SharedAccessSignature=%s",
+                $config->getAzureStorageAccountName(),
+                $config->getAzureSharedAccessSignature()
+            )),
+            $config->getAzureFileShareName(),
+            $config->getAzureSharedAccessSignature(),
+            $config->getAzureStorageAccountName()
         );
     }
 }

@@ -98,6 +98,8 @@ class FileStorageService
     }
 
     /**
+     * Delete the given file.
+     *
      * @param string $pathToFile
      * @return void
      * @throws RemoteFileDoesntExistException
@@ -106,5 +108,30 @@ class FileStorageService
     public function deleteFile(string $pathToFile): void
     {
         $this->getAdapter()->deleteFile($pathToFile);
+    }
+
+    /**
+     * List all files in the given directory.
+     *
+     * @param string $directory
+     * @param bool $includeDirectories If true, directories are included in the result
+     * @return string[]
+     * @throws DirectoryDoesntExistsException
+     * @throws UnknownErrorException
+     */
+    public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array
+    {
+        return $this->getAdapter()->listFilesInDirectory($directory, $includeDirectories);
+    }
+
+    /**
+     * @param string $pathToFile
+     * @return string
+     * @throws DirectoryDoesntExistsException
+     * @throws UnknownErrorException
+     */
+    public function getPublicFileUrl(string $pathToFile): string
+    {
+        return $this->getAdapter()->getPublicFileUrl($pathToFile);
     }
 }
