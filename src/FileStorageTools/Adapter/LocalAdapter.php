@@ -103,11 +103,12 @@ class LocalAdapter implements FileStorageAdapterInterface
     {
 
         $results = [];
-        if (!$files = scandir($directory)) {
+        $truePath = $this->remotePath . $directory;
+        if (!$files = scandir($truePath)) {
             throw new DirectoryDoesntExistsException("The directory doesn't seem to exist");
         }
         foreach ($files as $file) {
-            if (is_dir("{$directory}/{$file}")) {
+            if (is_dir("{$truePath}/{$file}")) {
                 if ($includeDirectories) {
                     $results[] = $file;
                 }

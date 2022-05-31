@@ -73,10 +73,10 @@ class LocalAdapterTest extends TestCase
     }
     public function testListFiles()
     {
-        $result = $this->instance->listFilesInDirectory(__DIR__ . "/files", false);
+        $result = $this->instance->listFilesInDirectory("/files", false);
+        self::assertEquals(count($result), 1);
+        $result = $this->instance->listFilesInDirectory("/files",);
         self::assertEquals(count($result), 3);
-        $result = $this->instance->listFilesInDirectory(__DIR__ . "/files",);
-        self::assertEquals(count($result), 5);
     }
     public function testPublicUrl()
     {
