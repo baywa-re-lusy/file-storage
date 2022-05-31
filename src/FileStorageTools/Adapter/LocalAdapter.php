@@ -17,27 +17,29 @@ class LocalAdapter implements FileStorageAdapterInterface
         protected string $remotePath
     ) {
     }
+
     /**
      * @inheritDoc
      */
     public function createDirectory(string $path): void
     {
         try {
-                if (!file_exists($this->remotePath)) {
-                    mkdir($this->remotePath, 0777, true);
-                }
-                if (file_exists($this->remotePath . $path)) {
+            if (!file_exists($this->remotePath)) {
+                mkdir($this->remotePath, 0777, true);
+            }
+            if (file_exists($this->remotePath . $path)) {
                 throw new DirectoryAlreadyExistsException("The directory already exists");
             }
-            if(!@mkdir($this->remotePath . $path, 0777, false)) {
+            if (!@mkdir($this->remotePath . $path, 0777, false)) {
                 throw new ParentNotFoundException("The parent directory could not be found");
             }
-        } catch (ParentNotFoundException | DirectoryAlreadyExistsException $e) {
+        } catch (ParentNotFoundException|DirectoryAlreadyExistsException $e) {
             throw $e;
         } catch (\Throwable $e) {
             throw new UnknownErrorException("Unexpected error");
         }
     }
+
     /**
      * @inheritDoc
      */
@@ -50,12 +52,13 @@ class LocalAdapter implements FileStorageAdapterInterface
             if (!@rmdir($this->remotePath . $path)) {
                 throw new DirectoryNotEmptyException("The directory isn't empty");
             }
-        } catch (DirectoryDoesntExistsException | DirectoryNotEmptyException $e) {
+        } catch (DirectoryDoesntExistsException|DirectoryNotEmptyException $e) {
             throw $e;
         } catch (\Throwable $e) {
             throw new UnknownErrorException("Idk man");
         }
     }
+
     /**
      * @inheritDoc
      */
@@ -78,6 +81,7 @@ class LocalAdapter implements FileStorageAdapterInterface
             throw new ParentNotFoundException("Remote parent could not be found");
         }
     }
+
     /**
      * @inheritDoc
      */
@@ -91,6 +95,7 @@ class LocalAdapter implements FileStorageAdapterInterface
         }
         unlink($this->remotePath . $pathToFile);
     }
+
     /**
      * @inheritDoc
      */
@@ -102,7 +107,7 @@ class LocalAdapter implements FileStorageAdapterInterface
             throw new DirectoryDoesntExistsException("The directory doesn't seem to exist");
         }
         foreach ($files as $file) {
-            if(is_dir("{$directory}/{$file}")) {
+            if (is_dir("{$directory}/{$file}")) {
                 if ($includeDirectories) {
                     $results[] = $file;
                 }
@@ -112,6 +117,7 @@ class LocalAdapter implements FileStorageAdapterInterface
         }
         return $results;
     }
+
     /**
      * @inheritDoc
      */
