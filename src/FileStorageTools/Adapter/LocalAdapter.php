@@ -55,7 +55,7 @@ class LocalAdapter implements FileStorageAdapterInterface
         } catch (DirectoryDoesntExistsException | DirectoryNotEmptyException $e) {
             throw $e;
         } catch (\Throwable $e) {
-            throw new UnknownErrorException("Idk man");
+            throw new UnknownErrorException("Unknown exception");
         }
     }
 
@@ -69,16 +69,19 @@ class LocalAdapter implements FileStorageAdapterInterface
             $this->createDirectory($this->remotePath);
         }
         // Check first if local file exists and can be opened
-        if (!file_exists($directory . $pathToFile)) {
+        if (!file_exists($pathToFile)) {
             throw new LocalFileNotFoundException("File not found.");
         }
-        if (!$fileContent = file_get_contents($directory . $pathToFile)) {
+        if (!$fileContent = file_get_contents($pathToFile)) {
             throw new FileCouldNotBeOpenedException("File couldn't be read.");
         }
-        try {
-            file_put_contents($this->remotePath . $pathToFile, $fileContent);
-        } catch (\Throwable $e) {
+        if (!file_exists($this->remotePath . $directory)) {
             throw new ParentNotFoundException("Remote parent could not be found");
+        }
+        try {
+            file_put_contents($this->remotePath . $directory . '/' . basename($pathToFile), $fileContent);
+        } catch (\Throwable $e) {
+            throw new UnknownErrorException("Unknown error");
         }
     }
 
