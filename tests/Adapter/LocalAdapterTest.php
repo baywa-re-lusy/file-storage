@@ -9,8 +9,6 @@ use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
-use Cassandra\Exception\AlreadyExistsException;
-use phpmock\functions\FixedValueFunction;
 use phpmock\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -63,13 +61,13 @@ class LocalAdapterTest extends TestCase
     }
     public function testFileUpload()
     {
-        $this->instance->uploadFile(__DIR__ , '/files/test.txt');
+        $this->instance->uploadFile('/files' , __DIR__ .'/files/test.txt');
         self::assertTrue(file_exists(  __DIR__ . '/remote' . '/files/test.txt'));
     }
     public function testDeleteFile()
     {
         $this->instance->deleteFile('/files/test.txt');
-        $this->assertFalse(file_exists(__DIR__ . '/remote' . '/files/file.txt'));
+        $this->assertFalse(file_exists(__DIR__ . '/remote' . '/files/test.txt'));
     }
     public function testListFiles()
     {
@@ -104,18 +102,18 @@ class LocalAdapterTest extends TestCase
     {
         return
             [
-                ['/donotexists', LocalFileNotFoundException::class],
-                ['/files/test.jpg', FileCouldNotBeOpenedException::class],
-                ['/wrongFiles/file.txt', ParentNotFoundException::class]
+                ['/donotexists', '/files', LocalFileNotFoundException::class],
+                ['/files/test.jpg', '/files' ,FileCouldNotBeOpenedException::class],
+                ['/wrongFiles/file.txt','/wrongFiles' ,ParentNotFoundException::class]
             ];
     }
     /** @dataProvider dataProvider_testUploadException
      * @param string $path
      */
-    public function testUploadException(string $path, string $exceptionName)
+    public function testUploadException(string $path, string $dir, string $exceptionName)
     {
         $this->expectException($exceptionName);
-        $this->instance->uploadFile(__DIR__, $path);
+        $this->instance->uploadFile($dir,__DIR__ . $path);
     }
     public function dataProvider_testDeleteException(): array
     {
@@ -125,13 +123,13 @@ class LocalAdapterTest extends TestCase
                 ['/files/noexist.txt', RemoteFileDoesntExistException::class]
             ];
     }
-//    /** @dataProvider dataProvider_testDeleteException
-//     * @param string $path
-//     * @param class-string<\Exception> $exceptionName
-//     */
-//    public function testDeleteException(string $path, string $exceptionName)
-//    {
-//        $this->expectException($exceptionName);
-//        $this->instance->deleteFile($path);
-//    }
+    /** @dataProvider dataProvider_testDeleteException
+     * @param string $path
+     * @param class-string<\Exception> $exceptionName
+     */
+    public function testDeleteException(string $path, string $exceptionName)
+    {
+        $this->expectException($exceptionName);
+        $this->instance->deleteFile($path);
+    }
 }
