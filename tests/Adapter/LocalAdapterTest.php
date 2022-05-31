@@ -50,12 +50,14 @@ class LocalAdapterTest extends TestCase
     public function testFileUpload()
     {
         $this->instance->uploadFile(__DIR__ , '/files/test.txt');
-        self::assertTrue(file_exists(LocalAdapter::REMOTE_DIRECTORY . '/files/test.txt'));
+        self::assertTrue(file_exists(__DIR__ . LocalAdapter::REMOTE_DIRECTORY . '/files/test.txt'));
     }
     public function testListFiles()
     {
-        $result = $this->instance->listFilesInDirectory(__DIR__ . "/files");
+        $result = $this->instance->listFilesInDirectory(__DIR__ . "/files", false);
         self::assertEquals(count($result), 2);
+        $result = $this->instance->listFilesInDirectory(__DIR__ . "/files",);
+        self::assertEquals(count($result), 4);
     }
     public function testPublicUrl()
     {
