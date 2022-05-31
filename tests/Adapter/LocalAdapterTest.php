@@ -125,13 +125,13 @@ class LocalAdapterTest extends TestCase
                 ['/files/noexist.txt', RemoteFileDoesntExistException::class]
             ];
     }
-    /** @dataProvider dataProvider_testDeleteException
-     * @param string $path
-     * @param class-string<\Exception> $exceptionName
-     */
-    public function testDeleteException(string $path, string $exceptionName)
-    {
-        $this->expectException($exceptionName);
-        $this->instance->deleteFile($path);
-    }
+//    /** @dataProvider dataProvider_testDeleteException
+//     * @param string $path
+//     * @param class-string<\Exception> $exceptionName
+//     */
+//    public function testDeleteException(string $path, string $exceptionName)
+//    {
+//        $this->expectException($exceptionName);
+//        $this->instance->deleteFile($path);
+//    }
 }

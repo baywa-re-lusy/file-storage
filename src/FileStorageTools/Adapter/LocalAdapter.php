@@ -33,7 +33,7 @@ class LocalAdapter implements FileStorageAdapterInterface
             if (!@mkdir($this->remotePath . $path, 0777, false)) {
                 throw new ParentNotFoundException("The parent directory could not be found");
             }
-        } catch (ParentNotFoundException|DirectoryAlreadyExistsException $e) {
+        } catch (ParentNotFoundException | DirectoryAlreadyExistsException $e) {
             throw $e;
         } catch (\Throwable $e) {
             throw new UnknownErrorException("Unexpected error");
@@ -52,7 +52,7 @@ class LocalAdapter implements FileStorageAdapterInterface
             if (!@rmdir($this->remotePath . $path)) {
                 throw new DirectoryNotEmptyException("The directory isn't empty");
             }
-        } catch (DirectoryDoesntExistsException|DirectoryNotEmptyException $e) {
+        } catch (DirectoryDoesntExistsException | DirectoryNotEmptyException $e) {
             throw $e;
         } catch (\Throwable $e) {
             throw new UnknownErrorException("Idk man");
