@@ -22,23 +22,46 @@ class LocalAdapterTest extends TestCase
     {
         $this->instance = new LocalAdapter(__DIR__ . '/remote');
     }
-    public function testCreateDirectory()
+    public function dataProvider_testCreationDirectory(): array
+    {
+        return
+            [
+                ['/testdir'],
+                ['testdir'],
+            ];
+    }
+    /** @dataProvider dataProvider_testCreationDirectory
+     * @param string $path
+     */
+    public function testCreateDirectory(string $path)
     {
         $builderMkDir = new MockBuilder();
         $builderMkDir
             ->setName('mkdir')
             ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
             ->setFunction(function ($directory) {
+                echo $directory;
                 $this->assertEquals(__DIR__ . '/remote' . '/testdir', $directory);
                 return true;
             });
 
         $mkDirMock = $builderMkDir->build();
         $mkDirMock->enable();
-        $this->instance->createDirectory("/testdir");
+        $this->instance->createDirectory($path);
         $mkDirMock->disable();
     }
-    public function testDeleteDirectory()
+    public function dataProvider_testDeleteDirectory(): array
+    {
+        return
+            [
+                ['/testdir'],
+                ['testdir']
+            ];
+    }
+    /** @dataProvider dataProvider_testDeleteDirectory
+     * @param string $path
+     */
+    public function testDeleteDirectory(string $path)
     {
         $builderFileExists = new MockBuilder();
         $builderFileExists->setName('file_exists')
@@ -55,10 +78,11 @@ class LocalAdapterTest extends TestCase
         $rmDirMock = $builderRmDir->build();
         $fileExistsMock->enable();
         $rmDirMock->enable();
-        $this->instance->deleteDirectory("/testdir");
+        $this->instance->deleteDirectory($path);
         $fileExistsMock->disable();
         $rmDirMock->disable();
     }
+
     public function testFileUpload()
     {
         $this->instance->uploadFile('/files' , __DIR__ .'/files/test.txt');
@@ -69,12 +93,15 @@ class LocalAdapterTest extends TestCase
         $this->instance->deleteFile('/files/test.txt');
         $this->assertFalse(file_exists(__DIR__ . '/remote' . '/files/test.txt'));
     }
-    public function testListFiles()
+    public function testListFilesWithDirectory()
+    {
+        $result = $this->instance->listFilesInDirectory("/files",);
+        self::assertEquals(count($result), 3);
+    }
+    public function testListFilesWithoutDirectory()
     {
         $result = $this->instance->listFilesInDirectory("/files", false);
         self::assertEquals(count($result), 1);
-        $result = $this->instance->listFilesInDirectory("/files",);
-        self::assertEquals(count($result), 3);
     }
     public function testPublicUrl()
     {
@@ -86,6 +113,7 @@ class LocalAdapterTest extends TestCase
         return
         [
           ['/file/file/file', ParentNotFoundException::class],
+          ['/file/file.txt', ParentNotFoundException::class],
           ['/files', DirectoryAlreadyExistsException::class]
         ];
     }
@@ -103,7 +131,6 @@ class LocalAdapterTest extends TestCase
         return
             [
                 ['/donotexists', '/files', LocalFileNotFoundException::class],
-                ['/files/test.jpg', '/files' ,FileCouldNotBeOpenedException::class],
                 ['/wrongFiles/file.txt','/wrongFiles' ,ParentNotFoundException::class]
             ];
     }
