@@ -78,7 +78,7 @@ class LocalAdapter implements FileStorageAdapterInterface
         if (!file_exists($this->remotePath . DIRECTORY_SEPARATOR . $directory)) {
             throw new ParentNotFoundException("Remote parent could not be found");
         }
-        if (!fclose(fopen($pathToFile, 'r'))) {
+        if (!is_readable($pathToFile)) {
             throw new FileCouldNotBeOpenedException("The file could not be open");
         }
         if (!copy($pathToFile, $this->remotePath . DIRECTORY_SEPARATOR . $directory. DIRECTORY_SEPARATOR . basename($pathToFile)))
