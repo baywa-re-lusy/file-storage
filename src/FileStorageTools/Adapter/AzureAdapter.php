@@ -91,7 +91,7 @@ class AzureAdapter implements FileStorageAdapterInterface
     /**
      * @inheritDoc
      */
-    public function uploadFile(string $directory, string $pathToFile): void
+    public function uploadFile(string $remoteDirectory, string $pathToFile): void
     {
         // Check first if local file exists and can be opened
         if (!file_exists($pathToFile)) {
@@ -106,16 +106,19 @@ class AzureAdapter implements FileStorageAdapterInterface
         $filesize        = (int)filesize($pathToFile);
         $currentPosition = 0;
 
+        // Create path to remote file
+        $remoteFileName = trim($remoteDirectory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . basename($pathToFile);
+
         // Create the empty file first
         $createFileOptions = new CreateFileOptions();
         $createFileOptions->setContentLength($filesize);
-        $this->fileStorageClient->createFile($this->fileShare, $pathToFile, $filesize, $createFileOptions);
+        $this->fileStorageClient->createFile($this->fileShare, $remoteFileName, $filesize, $createFileOptions);
 
         // Upload chunks of maximum 4MB
         while ($currentPosition < $filesize) {
             $this->fileStorageClient->putFileRange(
                 $this->fileShare,
-                $pathToFile,
+                $remoteFileName,
                 $filePointer,
                 new Range($currentPosition, min($currentPosition + (4096 * 4096 - 1), $filesize - 1))
             );
