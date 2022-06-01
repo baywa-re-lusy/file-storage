@@ -120,7 +120,7 @@ class AzureAdapterTest extends TestCase
             ->method('putFileRange')
             ->with(
                 'file-share',
-                __DIR__ . '/files/test.txt',
+                'dir1/dir2/test.txt',
                 $filePointer,
                 self::callback(function ($param): bool {
                     return
@@ -162,7 +162,7 @@ class AzureAdapterTest extends TestCase
             ->withConsecutive(
                 [
                     'file-share',
-                    __DIR__ . '/files/test.txt',
+                    'dir1/dir2/test.txt',
                     $filePointer,
                     self::callback(function ($param): bool {
                         return
@@ -173,7 +173,7 @@ class AzureAdapterTest extends TestCase
                 ],
                 [
                     'file-share',
-                    __DIR__ . '/files/test.txt',
+                    'dir1/dir2/test.txt',
                     $filePointer,
                     self::callback(function ($param): bool {
                         return
