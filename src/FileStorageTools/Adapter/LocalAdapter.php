@@ -12,10 +12,14 @@ use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 
 class LocalAdapter implements FileStorageAdapterInterface
 {
+    /** @var string Base path of where to store the files */
     protected string $remotePath;
-    public function __construct(
-        string $remotePath
-    ) {
+
+    /**
+     * @param string $remotePath Base path of where to store the files
+     */
+    public function __construct(string $remotePath)
+    {
         $this->remotePath = rtrim($remotePath, '/');
     }
 
@@ -29,14 +33,20 @@ class LocalAdapter implements FileStorageAdapterInterface
                 mkdir($this->remotePath);
                 chmod($this->remotePath, 0777);
             }
-            $path = ltrim($path, '/');
+
+            $path = trim($path, DIRECTORY_SEPARATOR);
+
+            // Don't do anything if the directory already exists
             if (file_exists($this->remotePath . DIRECTORY_SEPARATOR . $path)) {
                 return;
             }
+
+            // Check if the parent directory exists
             if (!@mkdir($this->remotePath . DIRECTORY_SEPARATOR . $path)) {
-                throw new ParentNotFoundException("The parent directory could not be found");
+                throw new ParentNotFoundException('The parent directory could not be found');
             }
-            //Need to put the permissions with chmod, the default perm of mkdir does not work because of umask
+
+            // Need to set the permissions with chmod because otherwise they could be altered through umask
             if (!chmod($this->remotePath . DIRECTORY_SEPARATOR . $path, 0777)) {
                 throw new UnknownErrorException("Unexpected error");
             }
@@ -53,12 +63,14 @@ class LocalAdapter implements FileStorageAdapterInterface
     public function deleteDirectory(string $path): void
     {
         try {
-            $path = ltrim($path, '/');
+            $path = trim($path, '/');
+
             if (!file_exists($this->remotePath . DIRECTORY_SEPARATOR . $path)) {
-                throw new DirectoryDoesntExistsException("the directory doesn't exists");
+                throw new DirectoryDoesntExistsException("The directory doesn't exist.");
             }
+
             if (!@rmdir($this->remotePath . DIRECTORY_SEPARATOR . $path)) {
-                throw new DirectoryNotEmptyException("The directory isn't empty");
+                throw new DirectoryNotEmptyException("The directory isn't empty.");
             }
         } catch (DirectoryDoesntExistsException | DirectoryNotEmptyException $e) {
             throw $e;
@@ -70,20 +82,25 @@ class LocalAdapter implements FileStorageAdapterInterface
     /**
      * @inheritDoc
      */
-    public function uploadFile(string $directory, string $pathToFile): void
+    public function uploadFile(string $remoteDirectory, string $pathToFile): void
     {
-        $directory = ltrim($directory, '/');
+        $remoteDirectory = trim($remoteDirectory, DIRECTORY_SEPARATOR);
+
         // Check first if local file exists and can be opened
         if (!file_exists($pathToFile)) {
-            throw new LocalFileNotFoundException("File not found.");
+            throw new LocalFileNotFoundException('File not found.');
         }
-        $destinationPath = $this->remotePath . DIRECTORY_SEPARATOR . $directory;
-        if (!file_exists($destinationPath)) {
-            throw new ParentNotFoundException("Remote parent could not be found");
-        }
+
         if (!is_readable($pathToFile)) {
-            throw new FileCouldNotBeOpenedException("The file could not be open");
+            throw new FileCouldNotBeOpenedException("The file couldn't be opened.");
         }
+
+        $destinationPath = $this->remotePath . DIRECTORY_SEPARATOR . $remoteDirectory;
+
+        if (!file_exists($destinationPath)) {
+            throw new ParentNotFoundException("Remote parent could not be found.");
+        }
+
         if (!copy($pathToFile, $destinationPath . DIRECTORY_SEPARATOR . basename($pathToFile))) {
             throw new UnknownErrorException("Unknown error");
         }
@@ -94,13 +111,16 @@ class LocalAdapter implements FileStorageAdapterInterface
      */
     public function deleteFile(string $pathToFile): void
     {
-        $pathToFile = ltrim($pathToFile, '/');
+        $pathToFile = ltrim($pathToFile, DIRECTORY_SEPARATOR);
+
         if (!file_exists($this->remotePath . DIRECTORY_SEPARATOR . dirname($pathToFile))) {
-            throw new DirectoryDoesntExistsException("The remote directory does not exists");
+            throw new DirectoryDoesntExistsException("The remote directory doesn't exist.");
         }
+
         if (!file_exists($this->remotePath . DIRECTORY_SEPARATOR . $pathToFile)) {
-            throw new RemoteFileDoesntExistException("The remote file could not be found");
+            throw new RemoteFileDoesntExistException("The remote file couldn't be found.");
         }
+
         unlink($this->remotePath . DIRECTORY_SEPARATOR . $pathToFile);
     }
 
@@ -109,22 +129,19 @@ class LocalAdapter implements FileStorageAdapterInterface
      */
     public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array
     {
+        $results   = [];
+        $directory = $this->remotePath . DIRECTORY_SEPARATOR . trim($directory, DIRECTORY_SEPARATOR);
 
-        $results = [];
-        $directory = ltrim($directory, '/');
-        $truePath = $this->remotePath . DIRECTORY_SEPARATOR . $directory;
-        if (!$files = scandir($truePath)) {
-            throw new DirectoryDoesntExistsException("The directory doesn't seem to exist");
+        if (!$files = scandir($directory)) {
+            throw new DirectoryDoesntExistsException("The directory doesn't seem to exist.");
         }
+
         foreach ($files as $file) {
-            if (is_dir("{$truePath}/{$file}")) {
-                if ($includeDirectories) {
-                    $results[] = $file;
-                }
-            } else {
+            if (!is_dir("{$directory}/{$file}") || $includeDirectories) {
                 $results[] = $file;
             }
         }
+
         return $results;
     }
 
@@ -133,7 +150,8 @@ class LocalAdapter implements FileStorageAdapterInterface
      */
     public function getPublicFileUrl(string $pathToFile): string
     {
-        $pathToFile = ltrim($pathToFile, '/');
+        $pathToFile = ltrim($pathToFile, DIRECTORY_SEPARATOR);
+
         if (!file_exists($this->remotePath . DIRECTORY_SEPARATOR . $pathToFile)) {
             throw new LocalFileNotFoundException();
         }
