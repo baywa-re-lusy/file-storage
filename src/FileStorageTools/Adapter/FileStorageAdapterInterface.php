@@ -13,7 +13,6 @@
 
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
-use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryNotEmptyException;
 use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
@@ -42,7 +41,6 @@ interface FileStorageAdapterInterface
      *
      * @param string $path Path of the directory to create
      * @return void
-     * @throws DirectoryAlreadyExistsException
      * @throws ParentNotFoundException
      * @throws UnknownErrorException
      */

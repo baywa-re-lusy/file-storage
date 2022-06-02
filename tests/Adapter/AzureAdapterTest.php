@@ -3,7 +3,6 @@
 namespace BayWaReLusy\FileStorageTools\Test\Adapter;
 
 use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
@@ -75,14 +74,14 @@ class AzureAdapterTest extends TestCase
 
         return
             [
-                [$directoryAlreadyExistsException, DirectoryAlreadyExistsException::class],
+                [$directoryAlreadyExistsException],
                 [$parentNotFoundException, ParentNotFoundException::class],
                 [$this->createMock(ServiceException::class), UnknownErrorException::class],
             ];
     }
 
     /** @dataProvider dataProvider_testCreateDirectory_Exceptions */
-    public function testCreateDirectory_Exceptions(ServiceException $e, string $exceptionClassName): void
+    public function testCreateDirectory_Exceptions(ServiceException $e, string $exceptionClassName = null): void
     {
         $this->fileStorageClientMock
             ->expects($this->once())
@@ -90,7 +89,9 @@ class AzureAdapterTest extends TestCase
             ->with('file-share', 'test-directory')
             ->will($this->throwException($e));
 
-        $this->expectException($exceptionClassName);
+        if (!is_null($exceptionClassName)) {
+            $this->expectException($exceptionClassName);
+        }
 
         $this->instance->createDirectory('test-directory');
     }

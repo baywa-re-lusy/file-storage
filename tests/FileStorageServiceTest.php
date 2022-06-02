@@ -3,7 +3,6 @@
 namespace BayWaReLusy\FileStorageTools\Test;
 
 use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryNotEmptyException;
 use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
@@ -43,7 +42,6 @@ class FileStorageServiceTest extends TestCase
     {
         return
             [
-                [DirectoryAlreadyExistsException::class],
                 [ParentNotFoundException::class],
                 [UnknownErrorException::class],
             ];
