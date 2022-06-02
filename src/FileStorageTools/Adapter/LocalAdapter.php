@@ -2,7 +2,6 @@
 
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
-use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryNotEmptyException;
 use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
@@ -13,9 +12,11 @@ use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 
 class LocalAdapter implements FileStorageAdapterInterface
 {
+    protected string $remotePath;
     public function __construct(
-        protected string $remotePath
+        string $remotePath
     ) {
+        $this->remotePath = rtrim($remotePath, '/');
     }
 
     /**
@@ -25,16 +26,21 @@ class LocalAdapter implements FileStorageAdapterInterface
     {
         try {
             if (!file_exists($this->remotePath)) {
-                mkdir($this->remotePath, 0777, true);
+                mkdir($this->remotePath);
+                chmod($this->remotePath, 0777);
             }
             $path = ltrim($path, '/');
             if (file_exists($this->remotePath . DIRECTORY_SEPARATOR . $path)) {
-                throw new DirectoryAlreadyExistsException("The directory already exists");
+                return;
             }
-            if (!@mkdir($this->remotePath . DIRECTORY_SEPARATOR . $path, 0777, false)) {
+            if (!@mkdir($this->remotePath . DIRECTORY_SEPARATOR . $path)) {
                 throw new ParentNotFoundException("The parent directory could not be found");
             }
-        } catch (ParentNotFoundException | DirectoryAlreadyExistsException $e) {
+            //Need to put the permissions with chmod, the default perm of mkdir does not work because of umask
+            if (!chmod($this->remotePath . DIRECTORY_SEPARATOR . $path, 0777)) {
+                throw new UnknownErrorException("Unexpected error");
+            }
+        } catch (ParentNotFoundException $e) {
             throw $e;
         } catch (\Throwable $e) {
             throw new UnknownErrorException("Unexpected error");
@@ -67,10 +73,6 @@ class LocalAdapter implements FileStorageAdapterInterface
     public function uploadFile(string $directory, string $pathToFile): void
     {
         $directory = ltrim($directory, '/');
-        //Make a directory our "remote" place
-        if (!file_exists($this->remotePath)) {
-            $this->createDirectory($this->remotePath);
-        }
         // Check first if local file exists and can be opened
         if (!file_exists($pathToFile)) {
             throw new LocalFileNotFoundException("File not found.");
@@ -132,7 +134,7 @@ class LocalAdapter implements FileStorageAdapterInterface
     public function getPublicFileUrl(string $pathToFile): string
     {
         $pathToFile = ltrim($pathToFile, '/');
-        if (!file_exists(DIRECTORY_SEPARATOR . $pathToFile)) {
+        if (!file_exists($this->remotePath . DIRECTORY_SEPARATOR . $pathToFile)) {
             throw new LocalFileNotFoundException();
         }
         return sprintf("http://definitelynotavirus.ru/%s", $pathToFile);

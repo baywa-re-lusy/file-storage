@@ -3,9 +3,7 @@
 namespace BayWaReLusy\FileStorageTools\Test\Adapter;
 
 use BayWaReLusy\FileStorageTools\Adapter\LocalAdapter;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryAlreadyExistsException;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
-use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
@@ -20,7 +18,7 @@ class LocalAdapterTest extends TestCase
 
     public function setUp(): void
     {
-        $this->instance = new LocalAdapter(__DIR__ . '/remote');
+        $this->instance = new LocalAdapter(__DIR__ . '/remote/');
     }
     public function dataProvider_testCreationDirectory(): array
     {
@@ -44,10 +42,17 @@ class LocalAdapterTest extends TestCase
                 $this->assertEquals(__DIR__ . '/remote' . '/testdir', $directory);
                 return true;
             });
-
+        $builderChmod = new MockBuilder();
+        $builderChmod
+            ->setName('chmod')
+            ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
+            ->setFunction(function($path,$permissions){return true;});
+        $chmodMock = $builderChmod->build();
         $mkDirMock = $builderMkDir->build();
         $mkDirMock->enable();
+        $chmodMock->enable();
         $this->instance->createDirectory($path);
+        $chmodMock->disable();
         $mkDirMock->disable();
     }
     public function dataProvider_testDeleteDirectory(): array
@@ -88,6 +93,11 @@ class LocalAdapterTest extends TestCase
         $this->instance->uploadFile('/files' , __DIR__ .'/files/test.txt');
         self::assertTrue(file_exists(  __DIR__ . '/remote' . '/files/test.txt'));
     }
+    public function testPublicUrl()
+    {
+        $url = $this->instance->getPublicFileUrl('/files/test.txt');
+        $this->assertEquals($url, "http://definitelynotavirus.ru" . '/files/test.txt');
+    }
     public function testDeleteFile()
     {
         $this->instance->deleteFile('/files/test.txt');
@@ -103,18 +113,12 @@ class LocalAdapterTest extends TestCase
         $result = $this->instance->listFilesInDirectory("/files", false);
         self::assertEquals(count($result), 1);
     }
-    public function testPublicUrl()
-    {
-        $url = $this->instance->getPublicFileUrl(__DIR__ . '/files/test.txt');
-        $this->assertEquals($url, "http://definitelynotavirus.ru". __DIR__ . '/files/test.txt');
-    }
     public function dataProvider_testCreationException(): array
     {
         return
         [
           ['/file/file/file', ParentNotFoundException::class],
           ['/file/file.txt', ParentNotFoundException::class],
-          ['/files', DirectoryAlreadyExistsException::class]
         ];
     }
     /** @dataProvider dataProvider_testCreationException
