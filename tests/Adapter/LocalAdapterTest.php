@@ -115,7 +115,7 @@ class LocalAdapterTest extends TestCase
     public function testPublicUrl()
     {
         $url = $this->instance->getPublicFileUrl('/files/test.txt');
-        $this->assertEquals($url, "http://definitelynotavirus.ru" . '/files/test.txt');
+        $this->assertEquals($url, "testUrl" . '/remote' . '/files/test.txt');
     }
 
     public function testDeleteFile()
