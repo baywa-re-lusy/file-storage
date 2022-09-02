@@ -19,7 +19,7 @@ class LocalAdapterTest extends TestCase
 
     public function setUp(): void
     {
-        $this->instance = new LocalAdapter(__DIR__ . '/remote/', 'testUrl');
+        $this->instance = new LocalAdapter(__DIR__ . '/public/remote/', 'testUrl');
     }
 
     public function dataProvider_testCreationDirectory(): array
