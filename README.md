@@ -113,3 +113,13 @@ Optionally, you can include then the FileStorage Client into your Service Manage
 ```php
 $sm->setService(FileStorageTools::class, $fileStorageTools);
 ```
+
+## Local adapter
+
+This library also include a Local adapter for testing purposes.
+
+You just need to supply the adapter with the path to the remote file (has to contain the public folder) and the API's URL.
+
+```php
+(new FileStorageService())->setAdapter(new LocalAdapter('/var/www/html/public/remote', 'https://pim-api.lusy-dev.com'));
+```
