@@ -157,7 +157,7 @@ class LocalAdapter implements FileStorageAdapterInterface
         $pathToFile = ltrim($pathToFile, DIRECTORY_SEPARATOR);
 
         //we need to get the part of the url after public/
-        $relativePath = explode('public' ,$this->remotePath);
+        $relativePath = explode('public', $this->remotePath);
         if (count($relativePath) < 2) {
             throw new UnknownErrorException("The path should contain the 'public' folder");
         }
