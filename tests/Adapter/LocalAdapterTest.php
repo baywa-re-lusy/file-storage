@@ -43,7 +43,7 @@ class LocalAdapterTest extends TestCase
             ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
             ->setFunction(function ($directory) {
                 echo $directory;
-                $this->assertEquals(__DIR__ . '/remote' . '/testdir', $directory);
+                $this->assertEquals(__DIR__ . '/public/remote' . '/testdir', $directory);
                 return true;
             });
         $builderChmod = new MockBuilder();
@@ -92,7 +92,7 @@ class LocalAdapterTest extends TestCase
         $builderRmDir->setName('rmdir')
             ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
             ->setFunction(function ($path) {
-                $this->assertEquals(__DIR__ . '/remote' . "/testdir", $path);
+                $this->assertEquals(__DIR__ . '/public/remote' . "/testdir", $path);
                 return true;
             });
 
@@ -109,19 +109,19 @@ class LocalAdapterTest extends TestCase
     public function testFileUpload()
     {
         $this->instance->uploadFile('/files', __DIR__ .'/files/test.txt');
-        self::assertTrue(file_exists(__DIR__ . '/remote' . '/files/test.txt'));
+        self::assertTrue(file_exists(__DIR__ . '/public/remote' . '/files/test.txt'));
     }
 
     public function testPublicUrl()
     {
         $url = $this->instance->getPublicFileUrl('/files/test.txt');
-        $this->assertEquals($url, "testUrl" . '/remote' . '/files/test.txt');
+        $this->assertEquals($url, "testUrl" . '/public/remote' . '/files/test.txt');
     }
 
     public function testDeleteFile()
     {
         $this->instance->deleteFile('/files/test.txt');
-        $this->assertFalse(file_exists(__DIR__ . '/remote' . '/files/test.txt'));
+        $this->assertFalse(file_exists(__DIR__ . '/public/remote' . '/files/test.txt'));
     }
 
     public function testListFilesWithDirectory()
