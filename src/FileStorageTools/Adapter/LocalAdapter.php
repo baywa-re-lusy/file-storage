@@ -155,6 +155,6 @@ class LocalAdapter implements FileStorageAdapterInterface
         if (!file_exists($this->remotePath . DIRECTORY_SEPARATOR . $pathToFile)) {
             throw new LocalFileNotFoundException();
         }
-        return sprintf("http://definitelynotavirus.ru/%s", $pathToFile);
+        return ($this->remotePath . DIRECTORY_SEPARATOR . $pathToFile);
     }
 }
