@@ -19,7 +19,7 @@ class LocalAdapterTest extends TestCase
 
     public function setUp(): void
     {
-        $this->instance = new LocalAdapter(__DIR__ . '/remote/');
+        $this->instance = new LocalAdapter(__DIR__ . '/public/', 'testUrl');
     }
 
     public function dataProvider_testCreationDirectory(): array
@@ -43,7 +43,7 @@ class LocalAdapterTest extends TestCase
             ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
             ->setFunction(function ($directory) {
                 echo $directory;
-                $this->assertEquals(__DIR__ . '/remote' . '/testdir', $directory);
+                $this->assertEquals(__DIR__ . '/public' . '/testdir', $directory);
                 return true;
             });
         $builderChmod = new MockBuilder();
@@ -92,7 +92,7 @@ class LocalAdapterTest extends TestCase
         $builderRmDir->setName('rmdir')
             ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
             ->setFunction(function ($path) {
-                $this->assertEquals(__DIR__ . '/remote' . "/testdir", $path);
+                $this->assertEquals(__DIR__ . '/public' . "/testdir", $path);
                 return true;
             });
 
@@ -109,19 +109,19 @@ class LocalAdapterTest extends TestCase
     public function testFileUpload()
     {
         $this->instance->uploadFile('/files', __DIR__ .'/files/test.txt');
-        self::assertTrue(file_exists(__DIR__ . '/remote' . '/files/test.txt'));
+        self::assertTrue(file_exists(__DIR__ . '/public' . '/files/test.txt'));
     }
 
     public function testPublicUrl()
     {
         $url = $this->instance->getPublicFileUrl('/files/test.txt');
-        $this->assertEquals($url, "http://definitelynotavirus.ru" . '/files/test.txt');
+        $this->assertEquals($url, "testUrl" . '/files/test.txt');
     }
 
     public function testDeleteFile()
     {
         $this->instance->deleteFile('/files/test.txt');
-        $this->assertFalse(file_exists(__DIR__ . '/remote' . '/files/test.txt'));
+        $this->assertFalse(file_exists(__DIR__ . '/public' . '/files/test.txt'));
     }
 
     public function testListFilesWithDirectory()

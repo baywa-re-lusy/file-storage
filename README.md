@@ -113,3 +113,15 @@ Optionally, you can include then the FileStorage Client into your Service Manage
 ```php
 $sm->setService(FileStorageTools::class, $fileStorageTools);
 ```
+
+## Local adapter
+
+This library also includes a Local adapter for testing purposes.
+
+You have to supply the adapter with the path to the remote directory (it has to contain the 'public' folder) 
+created beforehand and given the appropriate rights for writing as well as the API's URL.
+
+```php
+(new FileStorageService())->setAdapter(new LocalAdapter('/var/www/html/public/remote', 'https://my-api.api-url.com'));
+```
+
