@@ -16,7 +16,7 @@ class LocalAdapter implements FileStorageAdapterInterface
     protected string $remotePath;
 
     /** @var string Local url for creation of public link */
-    protected string $originPath;
+    protected string $originUrl;
 
     /**
      * @param string $remotePath Base path of where to store the files
@@ -24,7 +24,7 @@ class LocalAdapter implements FileStorageAdapterInterface
     public function __construct(string $remotePath, string $originUrl)
     {
         $this->remotePath = rtrim($remotePath, '/');
-        $this->originPath = $originUrl;
+        $this->originUrl = $originUrl;
     }
 
     /**
@@ -165,6 +165,6 @@ class LocalAdapter implements FileStorageAdapterInterface
         if (!file_exists($this->remotePath . DIRECTORY_SEPARATOR . $pathToFile)) {
             throw new LocalFileNotFoundException();
         }
-        return ($this->originPath . $relativePath[1] . DIRECTORY_SEPARATOR . $pathToFile);
+        return ($this->originUrl . $relativePath[1] . DIRECTORY_SEPARATOR . $pathToFile);
     }
 }
