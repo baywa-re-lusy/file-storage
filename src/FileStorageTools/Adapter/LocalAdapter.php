@@ -165,6 +165,6 @@ class LocalAdapter implements FileStorageAdapterInterface
         if (!file_exists($this->remotePath . DIRECTORY_SEPARATOR . $pathToFile)) {
             throw new LocalFileNotFoundException();
         }
-        return ($this->originUrl . $relativePath[1] . DIRECTORY_SEPARATOR . $pathToFile);
+        return ($this->originUrl . $relativePath[1] . '/' . $pathToFile);
     }
 }
