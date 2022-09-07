@@ -194,7 +194,7 @@ class AzureAdapter implements FileStorageAdapterInterface
             $this->fileShare,
             ltrim($pathToFile, '/'),
             $this->sharedAccessSignature,
-            time().toString()
+            time()
         );
     }
 }
