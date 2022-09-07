@@ -360,8 +360,8 @@ class AzureAdapterTest extends TestCase
             ->will($this->returnValue(new GetFileResult()));
 
         $this->assertEquals(
-            'https://storage-account.file.core.windows.net/dirA/dirB/file1.jpg?SharedAccessSignature=sas',
-            $this->instance->getPublicFileUrl($file)
+            'https://storage-account.file.core.windows.net/file-share/dirA/dirB/file1.jpgsas&time=',
+            substr($this->instance->getPublicFileUrl($file), 0, -10)
         );
     }
 
