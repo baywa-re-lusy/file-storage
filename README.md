@@ -42,10 +42,11 @@ resource "azurerm_storage_share" "file_storage_share" {
 }
 
 # Generate Shared Access Signature
+# the property "signed_version" can't be set (or must be an old one) and "tag" and "filter" must be set to false
+# see https://github.com/hashicorp/terraform-provider-azurerm/issues/17558
 data "azurerm_storage_account_sas" "sas" {
   connection_string = azurerm_storage_account.file_storage.primary_connection_string
   https_only        = true
-  signed_version    = "2021-06-08"
 
   resource_types {
     service   = true
@@ -93,19 +94,19 @@ terraform output azure_shared_access_signature
 Currently, this library only supports Azure File Storage. However, it uses an Adapter pattern to allow adding other vendors easily.
 
 ```php
-use BayWaReLusy\FileStorageTools\FileStorageToolsConfig;
+use BayWaReLusy\FileStorageTools\FileServiceToolsConfig;
 use BayWaReLusy\FileStorageTools\FileStorageTools;
 use BayWaReLusy\FileStorageTools\FileStorageService;
-use BayWaReLusy\FileStorageTools\Adapter\AwsSqsAdapter;
+use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
 
-$fileStorageToolsConfig = new FileStorageToolsConfig(
+$fileStorageToolsConfig = new FileServiceToolsConfig(
     $azureSharedAccessSignature,
     $azureStorageAccountName,
     $azureFileShareName
 );
 $fileStorageTools   = new FileStorageTools($fileStorageToolsConfig);
 $fileStorageService = $fileStorageTools->get(FileStorageService::class);
-$fileStorageService->setAdapter($fileStorageTools->get(AzureFileStorageAdapter::class));
+$fileStorageService->setAdapter($fileStorageTools->get(AzureAdapter::class));
 ```
 
 Optionally, you can include then the FileStorage Client into your Service Manager:

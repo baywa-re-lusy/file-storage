@@ -187,12 +187,14 @@ class AzureAdapter implements FileStorageAdapterInterface
 
             throw new UnknownErrorException('Unknown File Storage error');
         }
-
+        // Adding a timestamp to avoid conditional headers client side if more than one request
         return sprintf(
-            "https://%s.file.core.windows.net/%s?SharedAccessSignature=%s",
+            "https://%s.file.core.windows.net/%s/%s%s&time=%s",
             $this->storageAccountName,
+            $this->fileShare,
             ltrim($pathToFile, '/'),
-            $this->sharedAccessSignature
+            $this->sharedAccessSignature,
+            time().toString()
         );
     }
 }
