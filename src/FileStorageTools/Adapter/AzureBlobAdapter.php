@@ -98,7 +98,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
             return $this->blobStorageClient->getBlobUrl(
                 dirname($pathToFile),
                 basename($pathToFile)
-            );
+            ) . $this->sharedAccessSignature;
         } catch (ServiceException $e) {
             error_log($e->getMessage());
             throw $e;
