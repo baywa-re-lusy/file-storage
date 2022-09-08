@@ -67,11 +67,9 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
                 throw new FileCouldNotBeOpenedException("File couldn't be opened.");
             }
             $options = new CreateBlockBlobOptions();
-            try {
-                $mimeType = mime_content_type($filePointer);
+            $mimeType = mime_content_type($filePointer);
+            if ($mimeType) {
                 $options->setContentType($mimeType);
-            } catch (\Throwable $e) {
-                error_log("The Mime type of the file could not be determined");
             }
             $this->blobStorageClient->createBlockBlob(
                 $remoteDirectory,
