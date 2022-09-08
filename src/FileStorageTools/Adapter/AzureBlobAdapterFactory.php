@@ -17,9 +17,9 @@ class AzureBlobAdapterFactory implements FactoryInterface
         return new AzureBlobAdapter(
             BlobRestProxy::createBlobService(sprintf(
                 "BlobEndpoint=https://%s.blob.core.windows.net/;SharedAccessSignature=%s",
-                    $config->getAzureStorageAccountName(),
-                    $config->getAzureSharedAccessSignature()
-                )),
+                $config->getAzureStorageAccountName(),
+                $config->getAzureSharedAccessSignature()
+            )),
             $config->getAzureSharedAccessSignature(),
             $config->getAzureStorageAccountName()
         );
