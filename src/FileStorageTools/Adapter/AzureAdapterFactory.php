@@ -13,7 +13,7 @@
 
 namespace BayWaReLusy\FileStorageTools\Adapter;
 
-use BayWaReLusy\FileStorageTools\FileServiceToolsConfig;
+use BayWaReLusy\FileStorageTools\FileStorageToolsConfig;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use MicrosoftAzure\Storage\File\FileRestProxy;
@@ -31,8 +31,8 @@ class AzureAdapterFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        /** @var FileServiceToolsConfig $config */
-        $config = $container->get(FileServiceToolsConfig::class);
+        /** @var FileStorageToolsConfig $config */
+        $config = $container->get(FileStorageToolsConfig::class);
 
         return new AzureAdapter(
             FileRestProxy::createFileService(sprintf(

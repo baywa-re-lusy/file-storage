@@ -1,10 +1,10 @@
 <?php
 /**
- * FileServiceToolsConfig.php
+ * FileStorageToolsConfig.php
  *
  * @date        17.05.2022
  * @author      Pascal Paulis <pascal.paulis@baywa-re.com>
- * @file        FileServiceToolsConfig.php
+ * @file        FileStorageToolsConfig.php
  * @copyright   Copyright (c) BayWa r.e. - All rights reserved
  * @license     Unauthorized copying of this source code, via any medium is strictly
  *              prohibited, proprietary and confidential.
@@ -13,7 +13,7 @@
 namespace BayWaReLusy\FileStorageTools;
 
 /**
- * Class FileServiceToolsConfig
+ * Class FileStorageToolsConfig
  *
  * Config object for FileServiceTools
  *
@@ -23,7 +23,7 @@ namespace BayWaReLusy\FileStorageTools;
  * @license     Unauthorized copying of this source code, via any medium is strictly
  *              prohibited, proprietary and confidential.
  */
-class FileServiceToolsConfig
+class FileStorageToolsConfig
 {
     /**
      * @param string $azureSharedAccessSignature Shared Access Signature
