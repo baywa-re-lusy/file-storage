@@ -9,7 +9,8 @@
         "ext-mbstring": "*",
         "ext-curl": "*",
         "laminas/laminas-servicemanager": "^3.6",
-        "microsoft/azure-storage-file": "^1.2"
+        "microsoft/azure-storage-file": "^1.2",
+        "microsoft/azure-storage-blob": "^1.5.4"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.6",
