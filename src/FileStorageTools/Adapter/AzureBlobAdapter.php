@@ -53,7 +53,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
             }
             $this->blobStorageClient->createBlockBlob(
                 $remoteDirectory,
-                $pathToFile,
+                basename($pathToFile),
                 $filePointer
             );
         } catch (ServiceException $e) {
