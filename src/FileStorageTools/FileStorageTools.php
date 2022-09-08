@@ -29,11 +29,11 @@ use Laminas\ServiceManager\ServiceManager;
  */
 class FileStorageTools extends ServiceManager
 {
-    public function __construct(FileServiceToolsConfig $config)
+    public function __construct(FileStorageToolsConfig $config)
     {
         $services = require __DIR__ . '/../../config/module.config.php';
         parent::__construct($services['service_manager']);
 
-        $this->setService(FileServiceToolsConfig::class, $config);
+        $this->setService(FileStorageToolsConfig::class, $config);
     }
 }

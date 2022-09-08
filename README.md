@@ -94,12 +94,12 @@ terraform output azure_shared_access_signature
 Currently, this library only supports Azure File Storage. However, it uses an Adapter pattern to allow adding other vendors easily.
 
 ```php
-use BayWaReLusy\FileStorageTools\FileServiceToolsConfig;
+use BayWaReLusy\FileStorageTools\FileStorageToolsConfig;
 use BayWaReLusy\FileStorageTools\FileStorageTools;
 use BayWaReLusy\FileStorageTools\FileStorageService;
 use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
 
-$fileStorageToolsConfig = new FileServiceToolsConfig(
+$fileStorageToolsConfig = new FileStorageToolsConfig(
     $azureSharedAccessSignature,
     $azureStorageAccountName,
     $azureFileShareName
