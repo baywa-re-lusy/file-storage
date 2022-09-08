@@ -2,6 +2,8 @@
 
 use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
 use BayWaReLusy\FileStorageTools\Adapter\AzureAdapterFactory;
+use BayWaReLusy\FileStorageTools\Adapter\AzureBlobAdapter;
+use BayWaReLusy\FileStorageTools\Adapter\AzureBlobAdapterFactory;
 use BayWaReLusy\FileStorageTools\FileStorageService;
 
 return [
@@ -13,7 +15,8 @@ return [
                 ],
             'factories' =>
                 [
-                    AzureAdapter::class => AzureAdapterFactory::class
+                    AzureAdapter::class => AzureAdapterFactory::class,
+                    AzureBlobAdapter::class => AzureBlobAdapterFactory::class
                 ],
             'abstract_factories' =>
                 [
