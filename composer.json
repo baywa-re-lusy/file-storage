@@ -5,6 +5,7 @@
     "license": "proprietary",
     "homepage": "https://github.com/baywa-re-lusy/file-storage",
     "require": {
+        "ext-fileinfo": "*",
         "php": ">= 8.0",
         "ext-mbstring": "*",
         "ext-curl": "*",

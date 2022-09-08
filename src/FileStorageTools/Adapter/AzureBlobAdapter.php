@@ -9,6 +9,7 @@ use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 use MicrosoftAzure\Storage\Blob\BlobRestProxy;
+use MicrosoftAzure\Storage\Blob\Models\CreateBlockBlobOptions;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 
 class AzureBlobAdapter implements FileStorageAdapterInterface
@@ -65,10 +66,18 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
             if (!$filePointer = fopen($pathToFile, 'r')) {
                 throw new FileCouldNotBeOpenedException("File couldn't be opened.");
             }
+            $options = new CreateBlockBlobOptions();
+            try {
+                $mimeType = mime_content_type($filePointer);
+                $options->setContentType($mimeType);
+            } catch (\Throwable $e) {
+                error_log("The Mime type of the file could not be determined");
+            }
             $this->blobStorageClient->createBlockBlob(
                 $remoteDirectory,
                 basename($pathToFile),
-                $filePointer
+                $filePointer,
+                $options
             );
         } catch (ServiceException $e) {
             error_log($e->getMessage());
