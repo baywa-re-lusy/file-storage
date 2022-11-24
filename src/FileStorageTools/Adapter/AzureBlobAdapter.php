@@ -5,7 +5,6 @@ namespace BayWaReLusy\FileStorageTools\Adapter;
 use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
 use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
 use MicrosoftAzure\Storage\Blob\BlobRestProxy;
@@ -29,10 +28,8 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
         try {
             $this->blobStorageClient->createContainer(ltrim($path, '/'));
         } catch (ServiceException $e) {
-            if (str_contains($e->getMessage(), '<Code>ResourceAlreadyExists</Code>')) {
+            if (str_contains($e->getMessage(), '<Code>ContainerAlreadyExists</Code>')) {
                 return;
-            } elseif (str_contains($e->getMessage(), '<Code>ParentNotFound</Code>')) {
-                throw new ParentNotFoundException("The parent of the directory you want to create doesn't exist.");
             }
             throw new UnknownErrorException('Unknown File Storage error');
         }
@@ -46,8 +43,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
         try {
             $this->blobStorageClient->deleteContainer($path);
         } catch (ServiceException $e) {
-            error_log($e->getMessage());
-            throw $e;
+            if (str_contains($e->getMessage(), '<Code>ContainerNotFound</Code>')) {
+                throw new DirectoryDoesntExistsException(sprintf("The container '%s' doesn't exist.", $path));
+            }
+            throw new UnknownErrorException('Unknown File Storage error');
         }
     }
 
@@ -77,8 +76,9 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
                 $options
             );
         } catch (ServiceException $e) {
-            error_log($e->getMessage());
             throw $e;
+        } catch (\Throwable $e) {
+            throw new UnknownErrorException('Unknown File Storage error');
         }
     }
 
@@ -93,10 +93,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
                 basename($pathToFile)
             );
         } catch (ServiceException $e) {
-            if (str_contains($e->getMessage(), '<Code>ResourceNotFound</Code>')) {
+            error_log($e->getMessage());
+            if (str_contains($e->getMessage(), '<Code>BlobNotFound</Code>')) {
                 throw new RemoteFileDoesntExistException(sprintf("The file '%s' couldn't be found.", $pathToFile));
             }
-
             throw new UnknownErrorException('Unknown File Storage error');
         }
     }
@@ -114,27 +114,31 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
             }
             return $results;
         } catch (ServiceException $e) {
-            if (str_contains($e->getMessage(), '<Code>ResourceNotFound</Code>')) {
-                throw new DirectoryDoesntExistsException(sprintf("The directory '%s' doesn't exist.", $directory));
+            if (str_contains($e->getMessage(), '<Code>ContainerNotFound</Code>')) {
+                throw new DirectoryDoesntExistsException(sprintf("The container '%s' doesn't exist.", $directory));
             }
-
             throw new UnknownErrorException('Unknown File Storage error');
         }
     }
 
     /**
      * @inheritDoc
+     * @throws RemoteFileDoesntExistException
      */
     public function getPublicFileUrl(string $pathToFile): string
     {
         try {
+            //check that the file exists, getBlobUrl doesn't care
+            $this->blobStorageClient->getBlob(dirname($pathToFile), basename($pathToFile));
             return $this->blobStorageClient->getBlobUrl(
-                ltrim(dirname($pathToFile), '/'),
-                basename($pathToFile)
-            ) . $this->sharedAccessSignature;
+                    ltrim(dirname($pathToFile), '/'),
+                    basename($pathToFile)
+                ) . $this->sharedAccessSignature;
         } catch (ServiceException $e) {
-            if (str_contains($e->getMessage(), '<Code>ResourceNotFound</Code>')) {
-                throw new RemoteFileDoesntExistException(sprintf("The file '%s' doesn't exist.", $pathToFile));
+            if (str_contains($e->getMessage(), '<Code>BlobNotFound</Code>')) {
+                throw new RemoteFileDoesntExistException(sprintf("The file '%s' doesn't exist.", basename($pathToFile)));
+            } elseif (str_contains($e->getMessage(), '<Code>ContainerNotFound</Code>')) {
+                throw new DirectoryDoesntExistsException(sprintf("The container '%s' doesn't exist.", dirname($pathToFile)));
             }
             throw new UnknownErrorException('Unknown File Storage error');
         }

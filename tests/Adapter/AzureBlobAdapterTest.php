@@ -59,18 +59,16 @@ class AzureBlobAdapterTest extends TestCase
         $reflectionException             = new ReflectionClass(ServiceException::class);
         $message                         = $reflectionException->getProperty('message');
         $message->setAccessible(true);
-        $message->setValue($directoryAlreadyExistsException, '...<Code>ResourceAlreadyExists</Code>...');
+        $message->setValue($directoryAlreadyExistsException, '...<Code>ContainerAlreadyExists</Code>...');
 
         $parentNotFoundException = new ServiceException(new Response());
         $reflectionException     = new ReflectionClass(ServiceException::class);
         $message                 = $reflectionException->getProperty('message');
         $message->setAccessible(true);
-        $message->setValue($parentNotFoundException, '...<Code>ParentNotFound</Code>...');
 
         return
             [
                 [$directoryAlreadyExistsException],
-                [$parentNotFoundException, ParentNotFoundException::class],
                 [$this->createMock(ServiceException::class), UnknownErrorException::class],
             ];
     }
@@ -134,7 +132,7 @@ class AzureBlobAdapterTest extends TestCase
         $reflectionException = new ReflectionClass(ServiceException::class);
         $message             = $reflectionException->getProperty('message');
         $message->setAccessible(true);
-        $message->setValue($serviceException, '...<Code>ResourceNotFound</Code>...');
+        $message->setValue($serviceException, '...<Code>BlobNotFound</Code>...');
 
         return
             [
@@ -198,7 +196,7 @@ class AzureBlobAdapterTest extends TestCase
         $reflectionException = new ReflectionClass(ServiceException::class);
         $message             = $reflectionException->getProperty('message');
         $message->setAccessible(true);
-        $message->setValue($serviceException, '...<Code>ResourceNotFound</Code>...');
+        $message->setValue($serviceException, '...<Code>ContainerNotFound</Code>...');
 
         return
             [
@@ -251,11 +249,18 @@ class AzureBlobAdapterTest extends TestCase
         $reflectionException = new ReflectionClass(ServiceException::class);
         $message             = $reflectionException->getProperty('message');
         $message->setAccessible(true);
-        $message->setValue($serviceException, '...<Code>ResourceNotFound</Code>...');
+        $message->setValue($serviceException, '...<Code>BlobNotFound</Code>...');
+        $containerNotFound = new ServiceException(new Response());
+        $reflectionException = new ReflectionClass(ServiceException::class);
+        $message                 = $reflectionException->getProperty('message');
+        $message->setAccessible(true);
+        $message->setValue($containerNotFound, '...<Code>ContainerNotFound</Code>...');
+
 
         return
             [
                 [$serviceException, RemoteFileDoesntExistException::class],
+                [$containerNotFound, DirectoryDoesntExistsException::class],
                 [$this->createMock(ServiceException::class), UnknownErrorException::class],
             ];
     }
