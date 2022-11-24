@@ -131,14 +131,20 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
             //check that the file exists, getBlobUrl doesn't care
             $this->blobStorageClient->getBlob(dirname($pathToFile), basename($pathToFile));
             return $this->blobStorageClient->getBlobUrl(
-                    ltrim(dirname($pathToFile), '/'),
-                    basename($pathToFile)
-                ) . $this->sharedAccessSignature;
+                ltrim(dirname($pathToFile), '/'),
+                basename($pathToFile)
+            ) . $this->sharedAccessSignature;
         } catch (ServiceException $e) {
             if (str_contains($e->getMessage(), '<Code>BlobNotFound</Code>')) {
-                throw new RemoteFileDoesntExistException(sprintf("The file '%s' doesn't exist.", basename($pathToFile)));
+                throw new RemoteFileDoesntExistException(sprintf(
+                    "The file '%s' doesn't exist.",
+                    basename($pathToFile)
+                ));
             } elseif (str_contains($e->getMessage(), '<Code>ContainerNotFound</Code>')) {
-                throw new DirectoryDoesntExistsException(sprintf("The container '%s' doesn't exist.", dirname($pathToFile)));
+                throw new DirectoryDoesntExistsException(sprintf(
+                    "The container '%s' doesn't exist.",
+                    dirname($pathToFile)
+                ));
             }
             throw new UnknownErrorException('Unknown File Storage error');
         }
