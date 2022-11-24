@@ -34,7 +34,6 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
             } elseif (str_contains($e->getMessage(), '<Code>ParentNotFound</Code>')) {
                 throw new ParentNotFoundException("The parent of the directory you want to create doesn't exist.");
             }
-
             throw new UnknownErrorException('Unknown File Storage error');
         }
     }
@@ -137,7 +136,6 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
             if (str_contains($e->getMessage(), '<Code>ResourceNotFound</Code>')) {
                 throw new RemoteFileDoesntExistException(sprintf("The file '%s' doesn't exist.", $pathToFile));
             }
-
             throw new UnknownErrorException('Unknown File Storage error');
         }
     }

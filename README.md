@@ -91,7 +91,7 @@ terraform output azure_shared_access_signature
 
 ## Usage
 
-Currently, this library only supports Azure File Storage. However, it uses an Adapter pattern to allow adding other vendors easily.
+Currently, this library supports Azure File Storage. However, it uses an Adapter pattern to allow adding other vendors easily.
 
 ```php
 use BayWaReLusy\FileStorageTools\FileStorageToolsConfig;
@@ -107,6 +107,24 @@ $fileStorageToolsConfig = new FileStorageToolsConfig(
 $fileStorageTools   = new FileStorageTools($fileStorageToolsConfig);
 $fileStorageService = $fileStorageTools->get(FileStorageService::class);
 $fileStorageService->setAdapter($fileStorageTools->get(AzureAdapter::class));
+```
+
+It also includes an adapter for Blob storage on azure, it works with the same signature
+
+```php
+use BayWaReLusy\FileStorageTools\FileStorageToolsConfig;
+use BayWaReLusy\FileStorageTools\FileStorageTools;
+use BayWaReLusy\FileStorageTools\FileStorageService;
+use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
+
+$fileStorageToolsConfig = new FileStorageToolsConfig(
+    $azureSharedAccessSignature,
+    $azureStorageAccountName,
+    $azureFileShareName
+);
+$fileStorageTools   = new FileStorageTools($fileStorageToolsConfig);
+$fileStorageService = $fileStorageTools->get(FileStorageService::class);
+$fileStorageService->setAdapter($fileStorageTools->get(AzureBlobAdapter::class));
 ```
 
 Optionally, you can include then the FileStorage Client into your Service Manager:
