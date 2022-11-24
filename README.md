@@ -11,9 +11,9 @@ To install the File Storage tools, you will need [Composer](http://getcomposer.o
 composer require baywa-re-lusy/file-storage
 ```
 
-## Azure File Storage
+## Azure Blob Storage
 
-A configured Azure File Storage is needed to use the `AzureAdapter`. It can be created using `terraform`:
+A configured Azure Blob Storage is needed to use the `AzureBlobAdapter`. It can be created using `terraform`:
 ```hcl
 # Create the Storage Account
 resource "azurerm_storage_account" "file_storage" {
@@ -94,17 +94,17 @@ terraform output azure_shared_access_signature
 Currently, this library supports Azure File Storage. However, it uses an Adapter pattern to allow adding other vendors easily.
 
 ```php
-use BayWaReLusy\FileStorageTools\FileStorageToolsConfig;
-use BayWaReLusy\FileStorageTools\FileStorageTools;
-use BayWaReLusy\FileStorageTools\FileStorageService;
-use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
+use BayWaReLusy\FileStorage\FileStorageConfig;
+use BayWaReLusy\FileStorage\FileStorage;
+use BayWaReLusy\FileStorage\FileStorageService;
+use BayWaReLusy\FileStorage\Adapter\AzureAdapter;
 
-$fileStorageToolsConfig = new FileStorageToolsConfig(
+$fileStorageToolsConfig = new FileStorageConfig(
     $azureSharedAccessSignature,
     $azureStorageAccountName,
     $azureFileShareName
 );
-$fileStorageTools   = new FileStorageTools($fileStorageToolsConfig);
+$fileStorageTools   = new FileStorage($fileStorageToolsConfig);
 $fileStorageService = $fileStorageTools->get(FileStorageService::class);
 $fileStorageService->setAdapter($fileStorageTools->get(AzureAdapter::class));
 ```
@@ -112,17 +112,17 @@ $fileStorageService->setAdapter($fileStorageTools->get(AzureAdapter::class));
 It also includes an adapter for Blob storage on azure, it works with the same signature
 
 ```php
-use BayWaReLusy\FileStorageTools\FileStorageToolsConfig;
-use BayWaReLusy\FileStorageTools\FileStorageTools;
-use BayWaReLusy\FileStorageTools\FileStorageService;
-use BayWaReLusy\FileStorageTools\Adapter\AzureAdapter;
+use BayWaReLusy\FileStorage\FileStorageConfig;
+use BayWaReLusy\FileStorage\FileStorage;
+use BayWaReLusy\FileStorage\FileStorageService;
+use BayWaReLusy\FileStorage\Adapter\AzureAdapter;
 
-$fileStorageToolsConfig = new FileStorageToolsConfig(
+$fileStorageToolsConfig = new FileStorageConfig(
     $azureSharedAccessSignature,
     $azureStorageAccountName,
     $azureFileShareName
 );
-$fileStorageTools   = new FileStorageTools($fileStorageToolsConfig);
+$fileStorageTools   = new FileStorage($fileStorageToolsConfig);
 $fileStorageService = $fileStorageTools->get(FileStorageService::class);
 $fileStorageService->setAdapter($fileStorageTools->get(AzureBlobAdapter::class));
 ```
@@ -130,7 +130,7 @@ $fileStorageService->setAdapter($fileStorageTools->get(AzureBlobAdapter::class))
 Optionally, you can include then the FileStorage Client into your Service Manager:
 
 ```php
-$sm->setService(FileStorageTools::class, $fileStorageTools);
+$sm->setService(FileStorage::class, $fileStorageTools);
 ```
 
 ## Local adapter

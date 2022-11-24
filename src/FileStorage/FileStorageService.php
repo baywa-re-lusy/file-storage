@@ -11,22 +11,22 @@
  *            prohibited, proprietary and confidential.
  */
 
-namespace BayWaReLusy\FileStorageTools;
+namespace BayWaReLusy\FileStorage;
 
-use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryNotEmptyException;
-use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
-use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
-use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
+use BayWaReLusy\FileStorage\Adapter\FileStorageAdapterInterface;
+use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
+use BayWaReLusy\FileStorage\Exception\DirectoryNotEmptyException;
+use BayWaReLusy\FileStorage\Exception\FileCouldNotBeOpenedException;
+use BayWaReLusy\FileStorage\Exception\LocalFileNotFoundException;
+use BayWaReLusy\FileStorage\Exception\ParentNotFoundException;
+use BayWaReLusy\FileStorage\Exception\RemoteFileDoesntExistException;
+use BayWaReLusy\FileStorage\Exception\UnknownErrorException;
 
 /**
  * Class FileStorageService
  *
  * @package     BayWaReLusy
- * @subpackage  FileStorageTools
+ * @subpackage  FileStorage
  * @author      Pascal Paulis <pascal.paulis@baywa-re.com>
  * @copyright   Copyright (c) BayWa r.e. - All rights reserved
  * @license     Unauthorized copying of this source code, via any medium is strictly
