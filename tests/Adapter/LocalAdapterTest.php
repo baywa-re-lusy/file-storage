@@ -1,12 +1,12 @@
 <?php
 
-namespace BayWaReLusy\FileStorageTools\Test\Adapter;
+namespace BayWaReLusy\FileStorage\Test\Adapter;
 
-use BayWaReLusy\FileStorageTools\Adapter\LocalAdapter;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
-use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
+use BayWaReLusy\FileStorage\Adapter\LocalAdapter;
+use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
+use BayWaReLusy\FileStorage\Exception\LocalFileNotFoundException;
+use BayWaReLusy\FileStorage\Exception\ParentNotFoundException;
+use BayWaReLusy\FileStorage\Exception\RemoteFileDoesntExistException;
 use Exception;
 use phpmock\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -40,16 +40,15 @@ class LocalAdapterTest extends TestCase
         $builderMkDir = new MockBuilder();
         $builderMkDir
             ->setName('mkdir')
-            ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
+            ->setNamespace('BayWaReLusy\FileStorage\Adapter')
             ->setFunction(function ($directory) {
-                echo $directory;
                 $this->assertEquals(__DIR__ . '/public' . '/testdir', $directory);
                 return true;
             });
         $builderChmod = new MockBuilder();
         $builderChmod
             ->setName('chmod')
-            ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
+            ->setNamespace('BayWaReLusy\FileStorage\Adapter')
             ->setFunction(function () {
                 return true;
             });
@@ -82,7 +81,7 @@ class LocalAdapterTest extends TestCase
     {
         $builderFileExists = new MockBuilder();
         $builderFileExists->setName('file_exists')
-            ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
+            ->setNamespace('BayWaReLusy\FileStorage\Adapter')
             ->setFunction(function () {
                 return true;
             });
@@ -90,7 +89,7 @@ class LocalAdapterTest extends TestCase
 
         $builderRmDir = new MockBuilder();
         $builderRmDir->setName('rmdir')
-            ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
+            ->setNamespace('BayWaReLusy\FileStorage\Adapter')
             ->setFunction(function ($path) {
                 $this->assertEquals(__DIR__ . '/public' . "/testdir", $path);
                 return true;

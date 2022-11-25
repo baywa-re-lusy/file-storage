@@ -1,6 +1,6 @@
 <?php
 
-namespace BayWaReLusy\FileStorageTools\Exception;
+namespace BayWaReLusy\FileStorage\Exception;
 
 class FileCouldNotBeOpenedException extends \Exception
 {

@@ -1,23 +1,37 @@
 <?php
 
-namespace BayWaReLusy\FileStorageTools\Adapter;
+namespace BayWaReLusy\FileStorage\Adapter;
 
-use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
-use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
-use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
-use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
+use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
+use BayWaReLusy\FileStorage\Exception\FileCouldNotBeOpenedException;
+use BayWaReLusy\FileStorage\Exception\LocalFileNotFoundException;
+use BayWaReLusy\FileStorage\Exception\RemoteFileDoesntExistException;
+use BayWaReLusy\FileStorage\Exception\UnknownErrorException;
 use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 use MicrosoftAzure\Storage\Blob\Models\CreateBlockBlobOptions;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 
 class AzureBlobAdapter implements FileStorageAdapterInterface
 {
+    protected const CONNECTION_STRING = 'BlobEndpoint=https://%s.blob.core.windows.net/;SharedAccessSignature=%s';
+
+    protected ?BlobRestProxy $blobStorageClient = null;
+
     public function __construct(
-        protected BlobRestProxy $blobStorageClient,
-        protected string $sharedAccessSignature,
         protected string $storageAccountName,
+        protected string $sharedAccessSignature
     ) {
+    }
+
+    protected function getBlobStorageClient(): BlobRestProxy
+    {
+        if (!$this->blobStorageClient) {
+            $this->blobStorageClient = BlobRestProxy::createBlobService(
+                sprintf(self::CONNECTION_STRING, $this->storageAccountName, $this->sharedAccessSignature)
+            );
+        }
+
+        return $this->blobStorageClient;
     }
 
     /**
@@ -26,7 +40,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     public function createDirectory(string $path): void
     {
         try {
-            $this->blobStorageClient->createContainer(ltrim($path, '/'));
+            $this->getBlobStorageClient()->createContainer(ltrim($path, '/'));
         } catch (ServiceException $e) {
             if (str_contains($e->getMessage(), '<Code>ContainerAlreadyExists</Code>')) {
                 return;
@@ -41,7 +55,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     public function deleteDirectory(string $path): void
     {
         try {
-            $this->blobStorageClient->deleteContainer($path);
+            $this->getBlobStorageClient()->deleteContainer($path);
         } catch (ServiceException $e) {
             if (str_contains($e->getMessage(), '<Code>ContainerNotFound</Code>')) {
                 throw new DirectoryDoesntExistsException(sprintf("The container '%s' doesn't exist.", $path));
@@ -69,7 +83,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
             if ($mimeType) {
                 $options->setContentType($mimeType);
             }
-            $this->blobStorageClient->createBlockBlob(
+            $this->getBlobStorageClient()->createBlockBlob(
                 $remoteDirectory,
                 basename($pathToFile),
                 $filePointer,
@@ -88,12 +102,11 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     public function deleteFile(string $pathToFile): void
     {
         try {
-            $this->blobStorageClient->deleteBlob(
+            $this->getBlobStorageClient()->deleteBlob(
                 dirname($pathToFile),
                 basename($pathToFile)
             );
         } catch (ServiceException $e) {
-            error_log($e->getMessage());
             if (str_contains($e->getMessage(), '<Code>BlobNotFound</Code>')) {
                 throw new RemoteFileDoesntExistException(sprintf("The file '%s' couldn't be found.", $pathToFile));
             }
@@ -108,7 +121,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     {
         try {
             $results = [];
-            $blobs = $this->blobStorageClient->listBlobs(ltrim($directory, '/'));
+            $blobs = $this->getBlobStorageClient()->listBlobs(ltrim($directory, '/'));
             foreach ($blobs->getBlobs() as $blob) {
                 $results[] = $blob->getName();
             }
@@ -129,8 +142,8 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     {
         try {
             //check that the file exists, getBlobUrl doesn't care
-            $this->blobStorageClient->getBlob(dirname($pathToFile), basename($pathToFile));
-            return $this->blobStorageClient->getBlobUrl(
+            $this->getBlobStorageClient()->getBlob(dirname($pathToFile), basename($pathToFile));
+            return $this->getBlobStorageClient()->getBlobUrl(
                 ltrim(dirname($pathToFile), '/'),
                 basename($pathToFile)
             ) . $this->sharedAccessSignature;

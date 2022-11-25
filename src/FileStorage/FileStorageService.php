@@ -11,22 +11,22 @@
  *            prohibited, proprietary and confidential.
  */
 
-namespace BayWaReLusy\FileStorageTools;
+namespace BayWaReLusy\FileStorage;
 
-use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryNotEmptyException;
-use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
-use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
-use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
+use BayWaReLusy\FileStorage\Adapter\FileStorageAdapterInterface;
+use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
+use BayWaReLusy\FileStorage\Exception\DirectoryNotEmptyException;
+use BayWaReLusy\FileStorage\Exception\FileCouldNotBeOpenedException;
+use BayWaReLusy\FileStorage\Exception\LocalFileNotFoundException;
+use BayWaReLusy\FileStorage\Exception\ParentNotFoundException;
+use BayWaReLusy\FileStorage\Exception\RemoteFileDoesntExistException;
+use BayWaReLusy\FileStorage\Exception\UnknownErrorException;
 
 /**
  * Class FileStorageService
  *
  * @package     BayWaReLusy
- * @subpackage  FileStorageTools
+ * @subpackage  FileStorage
  * @author      Pascal Paulis <pascal.paulis@baywa-re.com>
  * @copyright   Copyright (c) BayWa r.e. - All rights reserved
  * @license     Unauthorized copying of this source code, via any medium is strictly
@@ -34,28 +34,12 @@ use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
  */
 class FileStorageService
 {
-    protected FileStorageAdapterInterface $adapter;
-
     /**
-     * Set the adapter.
-     *
-     * @param FileStorageAdapterInterface $adapter The adapter.
-     * @return self Provides a fluent interface.
+     * @param FileStorageAdapterInterface $adapter
      */
-    public function setAdapter(FileStorageAdapterInterface $adapter): self
-    {
-        $this->adapter = $adapter;
-        return $this;
-    }
-
-    /**
-     * Return the adapter.
-     *
-     * @return FileStorageAdapterInterface The adapter.
-     */
-    public function getAdapter(): FileStorageAdapterInterface
-    {
-        return $this->adapter;
+    public function __construct(
+        protected FileStorageAdapterInterface $adapter
+    ) {
     }
 
     /**
@@ -66,7 +50,7 @@ class FileStorageService
      */
     public function createDirectory(string $path): void
     {
-        $this->getAdapter()->createDirectory($path);
+        $this->adapter->createDirectory($path);
     }
 
     /**
@@ -78,7 +62,7 @@ class FileStorageService
      */
     public function deleteDirectory(string $path): void
     {
-        $this->getAdapter()->deleteDirectory($path);
+        $this->adapter->deleteDirectory($path);
     }
 
     /**
@@ -92,7 +76,7 @@ class FileStorageService
      */
     public function uploadFile(string $directory, string $pathToFile): void
     {
-        $this->getAdapter()->uploadFile($directory, $pathToFile);
+        $this->adapter->uploadFile($directory, $pathToFile);
     }
 
     /**
@@ -105,7 +89,7 @@ class FileStorageService
      */
     public function deleteFile(string $pathToFile): void
     {
-        $this->getAdapter()->deleteFile($pathToFile);
+        $this->adapter->deleteFile($pathToFile);
     }
 
     /**
@@ -119,7 +103,7 @@ class FileStorageService
      */
     public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array
     {
-        return $this->getAdapter()->listFilesInDirectory($directory, $includeDirectories);
+        return $this->adapter->listFilesInDirectory($directory, $includeDirectories);
     }
 
     /**
@@ -130,6 +114,6 @@ class FileStorageService
      */
     public function getPublicFileUrl(string $pathToFile): string
     {
-        return $this->getAdapter()->getPublicFileUrl($pathToFile);
+        return $this->adapter->getPublicFileUrl($pathToFile);
     }
 }

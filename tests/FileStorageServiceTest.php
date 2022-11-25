@@ -1,16 +1,16 @@
 <?php
 
-namespace BayWaReLusy\FileStorageTools\Test;
+namespace BayWaReLusy\FileStorage\Test;
 
-use BayWaReLusy\FileStorageTools\Adapter\FileStorageAdapterInterface;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryNotEmptyException;
-use BayWaReLusy\FileStorageTools\Exception\FileCouldNotBeOpenedException;
-use BayWaReLusy\FileStorageTools\Exception\LocalFileNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
-use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
-use BayWaReLusy\FileStorageTools\FileStorageService;
+use BayWaReLusy\FileStorage\Adapter\FileStorageAdapterInterface;
+use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
+use BayWaReLusy\FileStorage\Exception\DirectoryNotEmptyException;
+use BayWaReLusy\FileStorage\Exception\FileCouldNotBeOpenedException;
+use BayWaReLusy\FileStorage\Exception\LocalFileNotFoundException;
+use BayWaReLusy\FileStorage\Exception\ParentNotFoundException;
+use BayWaReLusy\FileStorage\Exception\RemoteFileDoesntExistException;
+use BayWaReLusy\FileStorage\Exception\UnknownErrorException;
+use BayWaReLusy\FileStorage\FileStorageService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -24,8 +24,7 @@ class FileStorageServiceTest extends TestCase
     {
         $this->adapterMock = $this->createMock(FileStorageAdapterInterface::class);
 
-        $this->instance = new FileStorageService();
-        $this->instance->setAdapter($this->adapterMock);
+        $this->instance = new FileStorageService($this->adapterMock);
     }
 
     public function testCreateDirectory(): void

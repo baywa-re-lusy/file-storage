@@ -1,37 +1,36 @@
 <?php
 
-namespace BayWaReLusy\FileStorageTools\Test\Adapter;
+namespace BayWaReLusy\FileStorage\Test\Adapter;
 
-use BayWaReLusy\FileStorageTools\Adapter\AzureBlobAdapter;
-use BayWaReLusy\FileStorageTools\Exception\DirectoryDoesntExistsException;
-use BayWaReLusy\FileStorageTools\Exception\ParentNotFoundException;
-use BayWaReLusy\FileStorageTools\Exception\RemoteFileDoesntExistException;
-use BayWaReLusy\FileStorageTools\Exception\UnknownErrorException;
+use BayWaReLusy\FileStorage\Adapter\AzureBlobAdapter;
+use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
+use BayWaReLusy\FileStorage\Exception\RemoteFileDoesntExistException;
+use BayWaReLusy\FileStorage\Exception\UnknownErrorException;
 use GuzzleHttp\Psr7\Response;
+use MicrosoftAzure\Storage\Blob\Models\Blob;
 use MicrosoftAzure\Storage\Blob\Models\ListBlobsResult;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
-use MicrosoftAzure\Storage\File\Models\File;
 use phpmock\functions\FixedValueFunction;
 use phpmock\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
-use MicrosoftAzure\Storage\Blob\BlobRestProxy as FileStorageClient;
+use MicrosoftAzure\Storage\Blob\BlobRestProxy as BlobStorageClient;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 class AzureBlobAdapterTest extends TestCase
 {
     protected AzureBlobAdapter $instance;
-    protected MockObject $fileStorageClientMock;
+    protected MockObject $blobStorageClientMock;
 
     public function setUp(): void
     {
-        $this->fileStorageClientMock = $this->createMock(FileStorageClient::class);
+        $this->blobStorageClientMock = $this->createMock(BlobStorageClient::class);
+        $this->instance = new AzureBlobAdapter('storage-account', 'sas');
 
-        $this->instance = new AzureBlobAdapter(
-            $this->fileStorageClientMock,
-            'sas',
-            'storage-account'
-        );
+        $adapter = new \ReflectionClass(AzureBlobAdapter::class);
+        $blobStorageClient  = $adapter->getProperty('blobStorageClient');
+        $blobStorageClient->setAccessible(true);
+        $blobStorageClient->setValue($this->instance, $this->blobStorageClientMock);
     }
 
     public function dataProvider_testCreateDirectory(): array
@@ -46,7 +45,7 @@ class AzureBlobAdapterTest extends TestCase
     /** @dataProvider dataProvider_testCreateDirectory */
     public function testCreateDirectory(string $directory): void
     {
-        $this->fileStorageClientMock
+        $this->blobStorageClientMock
             ->expects($this->once())
             ->method('createContainer')
             ->with('test-directory');
@@ -75,7 +74,7 @@ class AzureBlobAdapterTest extends TestCase
     /** @dataProvider dataProvider_testCreateDirectory_Exceptions */
     public function testCreateDirectory_Exceptions(ServiceException $e, string $exceptionClassName = null): void
     {
-        $this->fileStorageClientMock
+        $this->blobStorageClientMock
             ->expects($this->once())
             ->method('createContainer')
             ->with('test-directory')
@@ -93,12 +92,12 @@ class AzureBlobAdapterTest extends TestCase
         $filePointer = fopen(__DIR__ . '/files/test.txt', 'r');
         $builderFopen = new MockBuilder();
         $builderFopen
-            ->setNamespace('BayWaReLusy\FileStorageTools\Adapter')
+            ->setNamespace('BayWaReLusy\FileStorage\Adapter')
             ->setName('fopen')
             ->setFunctionProvider(new FixedValueFunction($filePointer));
         $mockFopen = $builderFopen->build();
         $mockFopen->enable();
-        $this->fileStorageClientMock
+        $this->blobStorageClientMock
             ->expects($this->once())
             ->method('createBlockBlob')
             ->with('dir1/dir2', 'test.txt', $filePointer);
@@ -118,7 +117,7 @@ class AzureBlobAdapterTest extends TestCase
     /** @dataProvider dataProvider_testDeleteFile */
     public function testDeleteFile($file): void
     {
-        $this->fileStorageClientMock
+        $this->blobStorageClientMock
             ->expects($this->once())
             ->method('deleteBlob')
             ->with(dirname($file), basename($file));
@@ -143,7 +142,7 @@ class AzureBlobAdapterTest extends TestCase
     /** @dataProvider dataProvider_testDeleteFile_Exceptions */
     public function testDeleteFile_Exceptions(ServiceException $e, string $exceptionClassName): void
     {
-        $this->fileStorageClientMock
+        $this->blobStorageClientMock
             ->expects($this->once())
             ->method('deleteBlob')
             ->with( 'dir', 'test.txt')
@@ -166,9 +165,9 @@ class AzureBlobAdapterTest extends TestCase
     /** @dataProvider dataProvider_testListFilesInDirectory */
     public function testListFilesInDirectory_IncludeDirectories(string $directory): void
     {
-        $file1 = new File();
+        $file1 = new Blob();
         $file1->setName('file1.jpg');
-        $file2 = new File();
+        $file2 = new Blob();
         $file2->setName('file2.jpg');
 
         $result         = new ListBlobsResult();
@@ -177,7 +176,7 @@ class AzureBlobAdapterTest extends TestCase
         $setFiles->setAccessible(true);
         $setFiles->invoke($result, [$file1, $file2]);
 
-        $this->fileStorageClientMock
+        $this->blobStorageClientMock
             ->expects($this->once())
             ->method('listBlobs')
             ->with('dirA/dirB')
@@ -208,7 +207,7 @@ class AzureBlobAdapterTest extends TestCase
     /** @dataProvider dataProvider_testListFilesInDirectory_Exceptions */
     public function testListFilesInDirectory_Exceptions(ServiceException $e, string $exceptionClassName): void
     {
-        $this->fileStorageClientMock
+        $this->blobStorageClientMock
             ->expects($this->once())
             ->method('listBlobs')
             ->with('dirA/dirB')
@@ -231,7 +230,7 @@ class AzureBlobAdapterTest extends TestCase
     /** @dataProvider dataProvider_testGetPublicFileUrl */
     public function testGetPublicFileUrl($file): void
     {
-        $this->fileStorageClientMock
+        $this->blobStorageClientMock
             ->expects($this->once())
             ->method('getBlobUrl')
             ->with('dirA/dirB', 'file1.jpg')
@@ -268,7 +267,7 @@ class AzureBlobAdapterTest extends TestCase
     /** @dataProvider dataProvider_testGetPublicFileUrl_Exceptions */
     public function testGetPublicFileUrl_Exceptions(ServiceException $e, string $exceptionClassName): void
     {
-        $this->fileStorageClientMock
+        $this->blobStorageClientMock
             ->expects($this->once())
             ->method('getBlobUrl')
             ->with('.', 'file.jpg')

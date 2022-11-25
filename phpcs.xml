@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="BayWa r.e. File Storage Tools Coding Standard">
-    <description>BayWa r.e. File Storage Tools Coding Standard</description>
+<ruleset name="BayWa r.e. File Storage Coding Standard">
+    <description>BayWa r.e. File Storage Coding Standard</description>
 
     <!-- display progress -->
     <arg value="p"/>
@@ -8,8 +8,6 @@
     <arg name="extensions" value="php,dist"/>
     <arg name="report-full"/>
     <arg name="report-junit" value="./results/PHPCS/result.xml"/>
-
-    <exclude-pattern>*.config.php</exclude-pattern>
 
     <!-- inherit rules from: -->
     <rule ref="PSR12"/>
