@@ -24,8 +24,7 @@ class FileStorageServiceTest extends TestCase
     {
         $this->adapterMock = $this->createMock(FileStorageAdapterInterface::class);
 
-        $this->instance = new FileStorageService();
-        $this->instance->setAdapter($this->adapterMock);
+        $this->instance = new FileStorageService($this->adapterMock);
     }
 
     public function testCreateDirectory(): void

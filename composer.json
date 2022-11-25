@@ -6,7 +6,7 @@
     "homepage": "https://github.com/baywa-re-lusy/file-storage",
     "require": {
         "ext-fileinfo": "*",
-        "php": ">= 8.0",
+        "php": ">= 8.1",
         "ext-mbstring": "*",
         "ext-curl": "*",
         "microsoft/azure-storage-blob": "^1.5"
