@@ -16,7 +16,7 @@ composer require baywa-re-lusy/file-storage
 A configured Azure Blob Storage is needed to use the `AzureBlobAdapter`. It can be created using `terraform`:
 ```hcl
 # Create the Storage Account
-resource "azurerm_storage_account" "file_storage" {
+resource "azurerm_storage_account" "blob_storage" {
   name                     = "storage-name"
   resource_group_name      = "resourge-group-name"
   location                 = "location"
@@ -24,21 +24,11 @@ resource "azurerm_storage_account" "file_storage" {
   account_replication_type = "GRS"
 }
 
-# Create a File Share inside the Storage Account
-resource "azurerm_storage_share" "file_storage_share" {
-  name                 = "my-file-share"
-  storage_account_name = azurerm_storage_account.file_storage.name
-  quota                = 1
-
-  acl {
-    id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # <=========== Generate a unique ID here
-
-    access_policy {
-      permissions = "rwdl"
-      start       = "2022-05-17T00:00:00.0000000Z"
-      expiry      = "2100-05-17T00:00:00.0000000Z"
-    }
-  }
+# Create a Blob Share inside the Storage Account
+resource "azurerm_storage_container" "container" {
+  name                  = "content"
+  storage_account_name  = azurerm_storage_account.blob_storage.name
+  container_access_type = "private"
 }
 
 # Generate Shared Access Signature
@@ -55,10 +45,10 @@ data "azurerm_storage_account_sas" "sas" {
   }
 
   services {
-    blob  = false
+    blob  = true
     queue = false
     table = false
-    file  = true
+    file  = false
   }
 
   start  = "2022-05-17T00:00:00Z"
@@ -91,56 +81,29 @@ terraform output azure_shared_access_signature
 
 ## Usage
 
-Currently, this library supports Azure File Storage. However, it uses an Adapter pattern to allow adding other vendors easily.
+Currently, this library supports Azure Blob Storage. However, it uses an Adapter pattern to allow adding other
+vendors easily.
 
+### Azure Blob
 ```php
-use BayWaReLusy\FileStorage\FileStorageConfig;
-use BayWaReLusy\FileStorage\FileStorage;
 use BayWaReLusy\FileStorage\FileStorageService;
-use BayWaReLusy\FileStorage\Adapter\AzureAdapter;
+use BayWaReLusy\FileStorage\Adapter\AzureBlobAdapter;
 
-$fileStorageToolsConfig = new FileStorageConfig(
-    $azureSharedAccessSignature,
-    $azureStorageAccountName,
-    $azureFileShareName
-);
-$fileStorageTools   = new FileStorage($fileStorageToolsConfig);
-$fileStorageService = $fileStorageTools->get(FileStorageService::class);
-$fileStorageService->setAdapter($fileStorageTools->get(AzureAdapter::class));
+$adapter            = new AzureBlobAdapter('<storage-account-name>', '<shared-access-signature>');
+$fileStorageService = new FileStorageService($adapter);
 ```
 
-It also includes an adapter for Blob storage on azure, it works with the same signature
-
-```php
-use BayWaReLusy\FileStorage\FileStorageConfig;
-use BayWaReLusy\FileStorage\FileStorage;
-use BayWaReLusy\FileStorage\FileStorageService;
-use BayWaReLusy\FileStorage\Adapter\AzureAdapter;
-
-$fileStorageToolsConfig = new FileStorageConfig(
-    $azureSharedAccessSignature,
-    $azureStorageAccountName,
-    $azureFileShareName
-);
-$fileStorageTools   = new FileStorage($fileStorageToolsConfig);
-$fileStorageService = $fileStorageTools->get(FileStorageService::class);
-$fileStorageService->setAdapter($fileStorageTools->get(AzureBlobAdapter::class));
-```
-
-Optionally, you can include then the FileStorage Client into your Service Manager:
-
-```php
-$sm->setService(FileStorage::class, $fileStorageTools);
-```
-
-## Local adapter
+### Local Storage
 
 This library also includes a Local adapter for testing purposes.
 
-You have to supply the adapter with the path to the remote directory (it has to contain the 'public' folder) 
+You have to supply the adapter with the path to the remote directory (it has to contain the 'public' folder)
 created beforehand and given the appropriate rights for writing as well as the API's URL.
 
 ```php
-(new FileStorageService())->setAdapter(new LocalAdapter('/var/www/html/public/remote', 'https://my-api.api-url.com'));
-```
+use BayWaReLusy\FileStorage\FileStorageService;
+use BayWaReLusy\FileStorage\Adapter\LocalAdapter;
 
+$adapter            = new LocalAdapter('/var/www/html/public/remote', 'https://my-api.api-url.com');
+$fileStorageService = new FileStorageService($adapter);
+```
