@@ -99,7 +99,7 @@ class LocalAdapter implements FileStorageAdapterInterface
 
         $destination = $this->remotePath . DIRECTORY_SEPARATOR . ltrim($remoteFilename, DIRECTORY_SEPARATOR);
 
-        if (!file_exists(basename($destination))) {
+        if (!file_exists(dirname($destination))) {
             throw new ParentNotFoundException("Remote parent could not be found.");
         }
 

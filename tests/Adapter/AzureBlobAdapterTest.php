@@ -100,8 +100,8 @@ class AzureBlobAdapterTest extends TestCase
         $this->blobStorageClientMock
             ->expects($this->once())
             ->method('createBlockBlob')
-            ->with('dir1/dir2', 'test.txt', $filePointer);
-        $this->instance->uploadFile('dir1/dir2', __DIR__ . '/files/test.txt');
+            ->with('dir1/dir2', 'test2.txt', $filePointer);
+        $this->instance->uploadFile(__DIR__ . '/files/test.txt', 'dir1/dir2/test2.txt');
         $mockFopen->disable();
     }
 
