@@ -68,15 +68,15 @@ class FileStorageService
     /**
      * Upload a file to an existing directory.
      *
-     * @param string $directory Existing remote directory
-     * @param string $pathToFile Path and name of the file to upload
+     * @param string $localFilename Absolute path to the file to upload
+     * @param string $remoteFilename Path to the remote file
      * @return void
-     * @throws LocalFileNotFoundException
      * @throws FileCouldNotBeOpenedException
+     * @throws LocalFileNotFoundException
      */
-    public function uploadFile(string $directory, string $pathToFile): void
+    public function uploadFile(string $localFilename, string $remoteFilename): void
     {
-        $this->adapter->uploadFile($directory, $pathToFile);
+        $this->adapter->uploadFile($localFilename, $remoteFilename);
     }
 
     /**

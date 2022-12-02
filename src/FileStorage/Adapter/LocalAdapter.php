@@ -86,26 +86,24 @@ class LocalAdapter implements FileStorageAdapterInterface
     /**
      * @inheritDoc
      */
-    public function uploadFile(string $remoteDirectory, string $pathToFile): void
+    public function uploadFile(string $localFilename, string $remoteFilename): void
     {
-        $remoteDirectory = trim($remoteDirectory, DIRECTORY_SEPARATOR);
-
         // Check first if local file exists and can be opened
-        if (!file_exists($pathToFile)) {
+        if (!file_exists($localFilename)) {
             throw new LocalFileNotFoundException('File not found.');
         }
 
-        if (!is_readable($pathToFile)) {
+        if (!is_readable($localFilename)) {
             throw new FileCouldNotBeOpenedException("The file couldn't be opened.");
         }
 
-        $destinationPath = $this->remotePath . DIRECTORY_SEPARATOR . $remoteDirectory;
+        $destination = $this->remotePath . DIRECTORY_SEPARATOR . ltrim($remoteFilename, DIRECTORY_SEPARATOR);
 
-        if (!file_exists($destinationPath)) {
+        if (!file_exists(basename($destination))) {
             throw new ParentNotFoundException("Remote parent could not be found.");
         }
 
-        if (!copy($pathToFile, $destinationPath . DIRECTORY_SEPARATOR . basename($pathToFile))) {
+        if (!copy($localFilename, $destination)) {
             throw new UnknownErrorException("Unknown error");
         }
     }

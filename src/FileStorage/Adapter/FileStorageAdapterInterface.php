@@ -63,13 +63,13 @@ interface FileStorageAdapterInterface
     /**
      * Upload a file to an existing directory.
      *
-     * @param string $remoteDirectory Existing remote directory
-     * @param string $pathToFile Path and name of the file to upload
+     * @param string $localFilename Absolute path to the file to upload
+     * @param string $remoteFilename Path to the remote file
      * @return void
      * @throws LocalFileNotFoundException
      * @throws FileCouldNotBeOpenedException
      */
-    public function uploadFile(string $remoteDirectory, string $pathToFile): void;
+    public function uploadFile(string $localFilename, string $remoteFilename): void;
 
     /**
      * Delete a file from the File Share.

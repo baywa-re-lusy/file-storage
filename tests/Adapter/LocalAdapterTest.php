@@ -107,7 +107,7 @@ class LocalAdapterTest extends TestCase
 
     public function testFileUpload()
     {
-        $this->instance->uploadFile('/files', __DIR__ .'/files/test.txt');
+        $this->instance->uploadFile(__DIR__ .'/files/test.txt', '/files/test.txt');
         self::assertTrue(file_exists(__DIR__ . '/public' . '/files/test.txt'));
     }
 

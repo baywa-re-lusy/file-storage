@@ -67,15 +67,15 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     /**
      * @inheritDoc
      */
-    public function uploadFile(string $remoteDirectory, string $pathToFile): void
+    public function uploadFile(string $localFilename, string $remoteFilename): void
     {
         try {
             // Check first if local file exists and can be opened
-            if (!file_exists($pathToFile)) {
+            if (!file_exists($localFilename)) {
                 throw new LocalFileNotFoundException("File not found.");
             }
 
-            if (!$filePointer = fopen($pathToFile, 'r')) {
+            if (!$filePointer = fopen($localFilename, 'r')) {
                 throw new FileCouldNotBeOpenedException("File couldn't be opened.");
             }
             $options = new CreateBlockBlobOptions();
@@ -84,8 +84,8 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
                 $options->setContentType($mimeType);
             }
             $this->getBlobStorageClient()->createBlockBlob(
-                $remoteDirectory,
-                basename($pathToFile),
+                dirname($remoteFilename),
+                basename($remoteFilename),
                 $filePointer,
                 $options
             );
