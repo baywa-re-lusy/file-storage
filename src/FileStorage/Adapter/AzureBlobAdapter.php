@@ -19,6 +19,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
 
     public function __construct(
         protected string $storageAccountName,
+        protected string $containerName,
         protected string $sharedAccessSignature
     ) {
     }
@@ -84,8 +85,8 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
                 $options->setContentType($mimeType);
             }
             $this->getBlobStorageClient()->createBlockBlob(
-                dirname($remoteFilename),
-                basename($remoteFilename),
+                $this->containerName,
+                $remoteFilename,
                 $filePointer,
                 $options
             );
