@@ -16,16 +16,30 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     protected const CONNECTION_STRING = 'BlobEndpoint=https://%s.blob.core.windows.net/;SharedAccessSignature=%s';
 
     protected ?BlobRestProxy $blobStorageClient = null;
+    protected ?string $containerName = null;
 
     public function __construct(
         protected string $storageAccountName,
-        protected string $containerName,
         protected string $sharedAccessSignature
     ) {
     }
 
+    /**
+     * @param string|null $containerName
+     * @return AzureBlobAdapter
+     */
+    public function setContainerName(?string $containerName): AzureBlobAdapter
+    {
+        $this->containerName = $containerName;
+        return $this;
+    }
+
     protected function getBlobStorageClient(): BlobRestProxy
     {
+        if (is_null($this->containerName)) {
+            throw new \Exception('Container name not set.');
+        }
+
         if (!$this->blobStorageClient) {
             $this->blobStorageClient = BlobRestProxy::createBlobService(
                 sprintf(self::CONNECTION_STRING, $this->storageAccountName, $this->sharedAccessSignature)
