@@ -25,8 +25,7 @@ class AzureBlobAdapterTest extends TestCase
     public function setUp(): void
     {
         $this->blobStorageClientMock = $this->createMock(BlobStorageClient::class);
-        $this->instance = new AzureBlobAdapter('storage-account', 'sas');
-        $this->instance->setContainerName('container');
+        $this->instance = new AzureBlobAdapter('storage-account', 'container', 'sas');
 
         $adapter = new \ReflectionClass(AzureBlobAdapter::class);
         $blobStorageClient  = $adapter->getProperty('blobStorageClient');
@@ -101,8 +100,8 @@ class AzureBlobAdapterTest extends TestCase
         $this->blobStorageClientMock
             ->expects($this->once())
             ->method('createBlockBlob')
-            ->with('container', 'test2.txt', $filePointer);
-        $this->instance->uploadFile(__DIR__ . '/files/test.txt', 'test2.txt');
+            ->with('container', 'dir/test2.txt', $filePointer);
+        $this->instance->uploadFile(__DIR__ . '/files/test.txt', 'dir/test2.txt');
         $mockFopen->disable();
     }
 
