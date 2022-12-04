@@ -2,6 +2,7 @@
 
 namespace BayWaReLusy\FileStorage\Adapter;
 
+use BayWaReLusy\FileStorage\Exception\ContainerNotSetException;
 use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorage\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorage\Exception\LocalFileNotFoundException;
@@ -27,7 +28,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     protected function getBlobStorageClient(): BlobRestProxy
     {
         if (empty($this->containerName)) {
-            throw new \Exception('Container name not set.');
+            throw new ContainerNotSetException('Container name not set.');
         }
 
         if (!$this->blobStorageClient) {
