@@ -44,6 +44,7 @@ interface FileStorageAdapterInterface
      * @return void
      * @throws ParentNotFoundException
      * @throws UnknownErrorException
+     * @throws ContainerNotSetException
      */
     public function createDirectory(string $path): void;
 
@@ -58,6 +59,7 @@ interface FileStorageAdapterInterface
      * @throws DirectoryDoesntExistsException
      * @throws DirectoryNotEmptyException
      * @throws UnknownErrorException
+     * @throws ContainerNotSetException
      */
     public function deleteDirectory(string $path): void;
 
@@ -69,6 +71,7 @@ interface FileStorageAdapterInterface
      * @return void
      * @throws LocalFileNotFoundException
      * @throws FileCouldNotBeOpenedException
+     * @throws ContainerNotSetException
      */
     public function uploadFile(string $localFilename, string $remoteFilename): void;
 
@@ -79,6 +82,7 @@ interface FileStorageAdapterInterface
      * @return void
      * @throws RemoteFileDoesntExistException
      * @throws UnknownErrorException
+     * @throws ContainerNotSetException
      */
     public function deleteFile(string $pathToFile): void;
 
@@ -90,6 +94,7 @@ interface FileStorageAdapterInterface
      * @return string[] List of files in the given directory
      * @throws DirectoryDoesntExistsException
      * @throws UnknownErrorException
+     * @throws ContainerNotSetException
      */
     public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array;
 
