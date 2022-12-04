@@ -26,6 +26,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
 
     protected function getBlobStorageClient(): BlobRestProxy
     {
+        if (empty($this->containerName)) {
+            throw new \Exception('Container name not set.');
+        }
+
         if (!$this->blobStorageClient) {
             $this->blobStorageClient = BlobRestProxy::createBlobService(
                 sprintf(self::CONNECTION_STRING, $this->storageAccountName, $this->sharedAccessSignature)
