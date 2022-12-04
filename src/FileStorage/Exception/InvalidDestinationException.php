@@ -2,6 +2,6 @@
 
 namespace BayWaReLusy\FileStorage\Exception;
 
-class ContainerNotSetException extends \Exception
+class InvalidDestinationException extends \Exception
 {
 }

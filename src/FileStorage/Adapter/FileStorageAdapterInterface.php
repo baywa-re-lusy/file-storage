@@ -13,7 +13,7 @@
 
 namespace BayWaReLusy\FileStorage\Adapter;
 
-use BayWaReLusy\FileStorage\Exception\ContainerNotSetException;
+use BayWaReLusy\FileStorage\Exception\InvalidDestinationException;
 use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorage\Exception\DirectoryNotEmptyException;
 use BayWaReLusy\FileStorage\Exception\FileCouldNotBeOpenedException;
@@ -44,7 +44,7 @@ interface FileStorageAdapterInterface
      * @return void
      * @throws ParentNotFoundException
      * @throws UnknownErrorException
-     * @throws ContainerNotSetException
+     * @throws InvalidDestinationException
      */
     public function createDirectory(string $path): void;
 
@@ -59,7 +59,7 @@ interface FileStorageAdapterInterface
      * @throws DirectoryDoesntExistsException
      * @throws DirectoryNotEmptyException
      * @throws UnknownErrorException
-     * @throws ContainerNotSetException
+     * @throws InvalidDestinationException
      */
     public function deleteDirectory(string $path): void;
 
@@ -71,7 +71,7 @@ interface FileStorageAdapterInterface
      * @return void
      * @throws LocalFileNotFoundException
      * @throws FileCouldNotBeOpenedException
-     * @throws ContainerNotSetException
+     * @throws InvalidDestinationException
      */
     public function uploadFile(string $localFilename, string $remoteFilename): void;
 
@@ -82,7 +82,7 @@ interface FileStorageAdapterInterface
      * @return void
      * @throws RemoteFileDoesntExistException
      * @throws UnknownErrorException
-     * @throws ContainerNotSetException
+     * @throws InvalidDestinationException
      */
     public function deleteFile(string $pathToFile): void;
 
@@ -94,7 +94,7 @@ interface FileStorageAdapterInterface
      * @return string[] List of files in the given directory
      * @throws DirectoryDoesntExistsException
      * @throws UnknownErrorException
-     * @throws ContainerNotSetException
+     * @throws InvalidDestinationException
      */
     public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array;
 
@@ -106,7 +106,7 @@ interface FileStorageAdapterInterface
      * @throws DirectoryDoesntExistsException
      * @throws UnknownErrorException
      * @throws RemoteFileDoesntExistException
-     * @throws ContainerNotSetException
+     * @throws InvalidDestinationException
      */
     public function getPublicFileUrl(string $pathToFile): string;
 }

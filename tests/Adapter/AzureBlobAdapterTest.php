@@ -3,7 +3,7 @@
 namespace BayWaReLusy\FileStorage\Test\Adapter;
 
 use BayWaReLusy\FileStorage\Adapter\AzureBlobAdapter;
-use BayWaReLusy\FileStorage\Exception\ContainerNotSetException;
+use BayWaReLusy\FileStorage\Exception\InvalidDestinationException;
 use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorage\Exception\RemoteFileDoesntExistException;
 use BayWaReLusy\FileStorage\Exception\UnknownErrorException;
@@ -61,7 +61,7 @@ class AzureBlobAdapterTest extends TestCase
         $containerName->setAccessible(true);
         $containerName->setValue($this->instance, '');
 
-        $this->expectException(ContainerNotSetException::class);
+        $this->expectException(InvalidDestinationException::class);
         $this->instance->createDirectory('test-directory');
     }
 
@@ -125,7 +125,7 @@ class AzureBlobAdapterTest extends TestCase
         $containerName->setAccessible(true);
         $containerName->setValue($this->instance, '');
 
-        $this->expectException(ContainerNotSetException::class);
+        $this->expectException(InvalidDestinationException::class);
         $this->instance->uploadFile(__DIR__ . '/files/test.txt', 'dir/test2.txt');
     }
 
@@ -156,7 +156,7 @@ class AzureBlobAdapterTest extends TestCase
         $containerName->setAccessible(true);
         $containerName->setValue($this->instance, '');
 
-        $this->expectException(ContainerNotSetException::class);
+        $this->expectException(InvalidDestinationException::class);
         $this->instance->deleteFile('file-to-delete');
     }
 
@@ -231,7 +231,7 @@ class AzureBlobAdapterTest extends TestCase
         $containerName->setAccessible(true);
         $containerName->setValue($this->instance, '');
 
-        $this->expectException(ContainerNotSetException::class);
+        $this->expectException(InvalidDestinationException::class);
         $this->instance->listFilesInDirectory('directory');
     }
 
@@ -295,7 +295,7 @@ class AzureBlobAdapterTest extends TestCase
         $containerName->setAccessible(true);
         $containerName->setValue($this->instance, '');
 
-        $this->expectException(ContainerNotSetException::class);
+        $this->expectException(InvalidDestinationException::class);
         $this->instance->getPublicFileUrl('path/to/file');
     }
 

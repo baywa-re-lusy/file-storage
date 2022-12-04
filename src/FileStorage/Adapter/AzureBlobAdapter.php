@@ -2,7 +2,7 @@
 
 namespace BayWaReLusy\FileStorage\Adapter;
 
-use BayWaReLusy\FileStorage\Exception\ContainerNotSetException;
+use BayWaReLusy\FileStorage\Exception\InvalidDestinationException;
 use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorage\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorage\Exception\LocalFileNotFoundException;
@@ -42,7 +42,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     public function createDirectory(string $path): void
     {
         if (empty($this->containerName)) {
-            throw new ContainerNotSetException('Container name not set.');
+            throw new InvalidDestinationException('Container name not set.');
         }
 
         try {
@@ -61,7 +61,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     public function deleteDirectory(string $path): void
     {
         if (empty($this->containerName)) {
-            throw new ContainerNotSetException('Container name not set.');
+            throw new InvalidDestinationException('Container name not set.');
         }
 
         try {
@@ -80,7 +80,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     public function uploadFile(string $localFilename, string $remoteFilename): void
     {
         if (empty($this->containerName)) {
-            throw new ContainerNotSetException('Container name not set.');
+            throw new InvalidDestinationException('Container name not set.');
         }
 
         try {
@@ -116,7 +116,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     public function deleteFile(string $pathToFile): void
     {
         if (empty($this->containerName)) {
-            throw new ContainerNotSetException('Container name not set.');
+            throw new InvalidDestinationException('Container name not set.');
         }
 
         try {
@@ -138,7 +138,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array
     {
         if (empty($this->containerName)) {
-            throw new ContainerNotSetException('Container name not set.');
+            throw new InvalidDestinationException('Container name not set.');
         }
 
         try {
@@ -162,7 +162,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     public function getPublicFileUrl(string $pathToFile): string
     {
         if (empty($this->containerName)) {
-            throw new ContainerNotSetException('Container name not set.');
+            throw new InvalidDestinationException('Container name not set.');
         }
 
         try {
