@@ -89,7 +89,7 @@ vendors easily.
 use BayWaReLusy\FileStorage\FileStorageService;
 use BayWaReLusy\FileStorage\Adapter\AzureBlobAdapter;
 
-$adapter            = new AzureBlobAdapter('<storage-account-name>', '<shared-access-signature>');
+$adapter            = new AzureBlobAdapter('<storage-account-name>', '<container name>', '<shared-access-signature>');
 $fileStorageService = new FileStorageService($adapter);
 ```
 
