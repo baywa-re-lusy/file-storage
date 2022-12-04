@@ -13,6 +13,7 @@
 
 namespace BayWaReLusy\FileStorage\Adapter;
 
+use BayWaReLusy\FileStorage\Exception\ContainerNotSetException;
 use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorage\Exception\DirectoryNotEmptyException;
 use BayWaReLusy\FileStorage\Exception\FileCouldNotBeOpenedException;
@@ -99,6 +100,8 @@ interface FileStorageAdapterInterface
      * @return string Publicly accessible URL of the given file
      * @throws DirectoryDoesntExistsException
      * @throws UnknownErrorException
+     * @throws RemoteFileDoesntExistException
+     * @throws ContainerNotSetException
      */
     public function getPublicFileUrl(string $pathToFile): string;
 }

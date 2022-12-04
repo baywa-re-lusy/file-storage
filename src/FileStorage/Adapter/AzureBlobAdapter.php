@@ -158,7 +158,6 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
 
     /**
      * @inheritDoc
-     * @throws RemoteFileDoesntExistException
      */
     public function getPublicFileUrl(string $pathToFile): string
     {
