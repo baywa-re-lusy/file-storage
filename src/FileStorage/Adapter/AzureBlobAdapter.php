@@ -27,10 +27,6 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
 
     protected function getBlobStorageClient(): BlobRestProxy
     {
-        if (empty($this->containerName)) {
-            throw new ContainerNotSetException('Container name not set.');
-        }
-
         if (!$this->blobStorageClient) {
             $this->blobStorageClient = BlobRestProxy::createBlobService(
                 sprintf(self::CONNECTION_STRING, $this->storageAccountName, $this->sharedAccessSignature)
@@ -45,6 +41,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
      */
     public function createDirectory(string $path): void
     {
+        if (empty($this->containerName)) {
+            throw new ContainerNotSetException('Container name not set.');
+        }
+
         try {
             $this->getBlobStorageClient()->createContainer(ltrim($path, '/'));
         } catch (ServiceException $e) {
@@ -60,6 +60,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
      */
     public function deleteDirectory(string $path): void
     {
+        if (empty($this->containerName)) {
+            throw new ContainerNotSetException('Container name not set.');
+        }
+
         try {
             $this->getBlobStorageClient()->deleteContainer($path);
         } catch (ServiceException $e) {
@@ -75,6 +79,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
      */
     public function uploadFile(string $localFilename, string $remoteFilename): void
     {
+        if (empty($this->containerName)) {
+            throw new ContainerNotSetException('Container name not set.');
+        }
+
         try {
             // Check first if local file exists and can be opened
             if (!file_exists($localFilename)) {
@@ -107,6 +115,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
      */
     public function deleteFile(string $pathToFile): void
     {
+        if (empty($this->containerName)) {
+            throw new ContainerNotSetException('Container name not set.');
+        }
+
         try {
             $this->getBlobStorageClient()->deleteBlob(
                 dirname($pathToFile),
@@ -125,6 +137,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
      */
     public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array
     {
+        if (empty($this->containerName)) {
+            throw new ContainerNotSetException('Container name not set.');
+        }
+
         try {
             $results = [];
             $blobs = $this->getBlobStorageClient()->listBlobs(ltrim($directory, '/'));
@@ -146,6 +162,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
      */
     public function getPublicFileUrl(string $pathToFile): string
     {
+        if (empty($this->containerName)) {
+            throw new ContainerNotSetException('Container name not set.');
+        }
+
         try {
             //check that the file exists, getBlobUrl doesn't care
             $this->getBlobStorageClient()->getBlob(dirname($pathToFile), basename($pathToFile));
