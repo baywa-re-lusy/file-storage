@@ -2,6 +2,7 @@
 
 namespace BayWaReLusy\FileStorage\Adapter;
 
+use BayWaReLusy\FileStorage\Exception\InvalidDestinationException;
 use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorage\Exception\FileCouldNotBeOpenedException;
 use BayWaReLusy\FileStorage\Exception\LocalFileNotFoundException;
@@ -19,6 +20,7 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
 
     public function __construct(
         protected string $storageAccountName,
+        protected string $containerName,
         protected string $sharedAccessSignature
     ) {
     }
@@ -39,6 +41,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
      */
     public function createDirectory(string $path): void
     {
+        if (empty($this->containerName)) {
+            throw new InvalidDestinationException('Container name not set.');
+        }
+
         try {
             $this->getBlobStorageClient()->createContainer(ltrim($path, '/'));
         } catch (ServiceException $e) {
@@ -54,6 +60,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
      */
     public function deleteDirectory(string $path): void
     {
+        if (empty($this->containerName)) {
+            throw new InvalidDestinationException('Container name not set.');
+        }
+
         try {
             $this->getBlobStorageClient()->deleteContainer($path);
         } catch (ServiceException $e) {
@@ -67,15 +77,19 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
     /**
      * @inheritDoc
      */
-    public function uploadFile(string $remoteDirectory, string $pathToFile): void
+    public function uploadFile(string $localFilename, string $remoteFilename): void
     {
+        if (empty($this->containerName)) {
+            throw new InvalidDestinationException('Container name not set.');
+        }
+
         try {
             // Check first if local file exists and can be opened
-            if (!file_exists($pathToFile)) {
+            if (!file_exists($localFilename)) {
                 throw new LocalFileNotFoundException("File not found.");
             }
 
-            if (!$filePointer = fopen($pathToFile, 'r')) {
+            if (!$filePointer = fopen($localFilename, 'r')) {
                 throw new FileCouldNotBeOpenedException("File couldn't be opened.");
             }
             $options = new CreateBlockBlobOptions();
@@ -84,8 +98,8 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
                 $options->setContentType($mimeType);
             }
             $this->getBlobStorageClient()->createBlockBlob(
-                $remoteDirectory,
-                basename($pathToFile),
+                $this->containerName,
+                $remoteFilename,
                 $filePointer,
                 $options
             );
@@ -101,6 +115,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
      */
     public function deleteFile(string $pathToFile): void
     {
+        if (empty($this->containerName)) {
+            throw new InvalidDestinationException('Container name not set.');
+        }
+
         try {
             $this->getBlobStorageClient()->deleteBlob(
                 dirname($pathToFile),
@@ -119,6 +137,10 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
      */
     public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array
     {
+        if (empty($this->containerName)) {
+            throw new InvalidDestinationException('Container name not set.');
+        }
+
         try {
             $results = [];
             $blobs = $this->getBlobStorageClient()->listBlobs(ltrim($directory, '/'));
@@ -136,10 +158,13 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
 
     /**
      * @inheritDoc
-     * @throws RemoteFileDoesntExistException
      */
     public function getPublicFileUrl(string $pathToFile): string
     {
+        if (empty($this->containerName)) {
+            throw new InvalidDestinationException('Container name not set.');
+        }
+
         try {
             //check that the file exists, getBlobUrl doesn't care
             $this->getBlobStorageClient()->getBlob(dirname($pathToFile), basename($pathToFile));

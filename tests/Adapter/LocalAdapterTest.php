@@ -107,7 +107,7 @@ class LocalAdapterTest extends TestCase
 
     public function testFileUpload()
     {
-        $this->instance->uploadFile('/files', __DIR__ .'/files/test.txt');
+        $this->instance->uploadFile(__DIR__ .'/files/test.txt', '/files/test.txt');
         self::assertTrue(file_exists(__DIR__ . '/public' . '/files/test.txt'));
     }
 
@@ -159,19 +159,16 @@ class LocalAdapterTest extends TestCase
     {
         return
             [
-                ['/donotexists', '/files', LocalFileNotFoundException::class],
-                ['/wrongFiles/file.txt', '/wrongFiles' , ParentNotFoundException::class]
+                [__DIR__ .'/files/notfound.txt', '/files/test.txt', LocalFileNotFoundException::class],
+                [__DIR__ .'/files/test.txt', '/notfound/test.txt' , ParentNotFoundException::class]
             ];
     }
 
-    /**
-     * @dataProvider dataProvider_testUploadException
-     * @param string $path
-     */
-    public function testUploadException(string $path, string $dir, string $exceptionName)
+    /** @dataProvider dataProvider_testUploadException */
+    public function testUploadException(string $localFilename, string $remoteFilename, string $exceptionName)
     {
         $this->expectException($exceptionName);
-        $this->instance->uploadFile($dir, __DIR__ . $path);
+        $this->instance->uploadFile($localFilename, $remoteFilename);
     }
 
     public function dataProvider_testDeleteException(): array

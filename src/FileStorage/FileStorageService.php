@@ -17,6 +17,7 @@ use BayWaReLusy\FileStorage\Adapter\FileStorageAdapterInterface;
 use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorage\Exception\DirectoryNotEmptyException;
 use BayWaReLusy\FileStorage\Exception\FileCouldNotBeOpenedException;
+use BayWaReLusy\FileStorage\Exception\InvalidDestinationException;
 use BayWaReLusy\FileStorage\Exception\LocalFileNotFoundException;
 use BayWaReLusy\FileStorage\Exception\ParentNotFoundException;
 use BayWaReLusy\FileStorage\Exception\RemoteFileDoesntExistException;
@@ -47,6 +48,7 @@ class FileStorageService
      * @return void
      * @throws ParentNotFoundException
      * @throws UnknownErrorException
+     * @throws InvalidDestinationException
      */
     public function createDirectory(string $path): void
     {
@@ -59,6 +61,7 @@ class FileStorageService
      * @throws DirectoryDoesntExistsException
      * @throws DirectoryNotEmptyException
      * @throws UnknownErrorException
+     * @throws InvalidDestinationException
      */
     public function deleteDirectory(string $path): void
     {
@@ -68,15 +71,16 @@ class FileStorageService
     /**
      * Upload a file to an existing directory.
      *
-     * @param string $directory Existing remote directory
-     * @param string $pathToFile Path and name of the file to upload
+     * @param string $localFilename Absolute path to the file to upload
+     * @param string $remoteFilename Path to the remote file
      * @return void
-     * @throws LocalFileNotFoundException
      * @throws FileCouldNotBeOpenedException
+     * @throws LocalFileNotFoundException
+     * @throws InvalidDestinationException
      */
-    public function uploadFile(string $directory, string $pathToFile): void
+    public function uploadFile(string $localFilename, string $remoteFilename): void
     {
-        $this->adapter->uploadFile($directory, $pathToFile);
+        $this->adapter->uploadFile($localFilename, $remoteFilename);
     }
 
     /**
@@ -86,6 +90,7 @@ class FileStorageService
      * @return void
      * @throws RemoteFileDoesntExistException
      * @throws UnknownErrorException
+     * @throws InvalidDestinationException
      */
     public function deleteFile(string $pathToFile): void
     {
@@ -100,6 +105,7 @@ class FileStorageService
      * @return string[]
      * @throws DirectoryDoesntExistsException
      * @throws UnknownErrorException
+     * @throws InvalidDestinationException
      */
     public function listFilesInDirectory(string $directory, bool $includeDirectories = true): array
     {
@@ -111,6 +117,8 @@ class FileStorageService
      * @return string
      * @throws DirectoryDoesntExistsException
      * @throws UnknownErrorException
+     * @throws InvalidDestinationException
+     * @throws RemoteFileDoesntExistException
      */
     public function getPublicFileUrl(string $pathToFile): string
     {

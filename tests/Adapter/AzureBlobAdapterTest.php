@@ -3,6 +3,7 @@
 namespace BayWaReLusy\FileStorage\Test\Adapter;
 
 use BayWaReLusy\FileStorage\Adapter\AzureBlobAdapter;
+use BayWaReLusy\FileStorage\Exception\InvalidDestinationException;
 use BayWaReLusy\FileStorage\Exception\DirectoryDoesntExistsException;
 use BayWaReLusy\FileStorage\Exception\RemoteFileDoesntExistException;
 use BayWaReLusy\FileStorage\Exception\UnknownErrorException;
@@ -25,10 +26,10 @@ class AzureBlobAdapterTest extends TestCase
     public function setUp(): void
     {
         $this->blobStorageClientMock = $this->createMock(BlobStorageClient::class);
-        $this->instance = new AzureBlobAdapter('storage-account', 'sas');
+        $this->instance = new AzureBlobAdapter('storage-account', 'container', 'sas');
 
         $adapter = new \ReflectionClass(AzureBlobAdapter::class);
-        $blobStorageClient  = $adapter->getProperty('blobStorageClient');
+        $blobStorageClient = $adapter->getProperty('blobStorageClient');
         $blobStorageClient->setAccessible(true);
         $blobStorageClient->setValue($this->instance, $this->blobStorageClientMock);
     }
@@ -52,6 +53,18 @@ class AzureBlobAdapterTest extends TestCase
 
         $this->instance->createDirectory($directory);
     }
+
+    public function testCreateDirectory_ContainerNotSet(): void
+    {
+        $adapter = new \ReflectionClass(AzureBlobAdapter::class);
+        $containerName = $adapter->getProperty('containerName');
+        $containerName->setAccessible(true);
+        $containerName->setValue($this->instance, '');
+
+        $this->expectException(InvalidDestinationException::class);
+        $this->instance->createDirectory('test-directory');
+    }
+
     public function dataProvider_testCreateDirectory_Exceptions(): array
     {
         $directoryAlreadyExistsException = new ServiceException(new Response());
@@ -100,9 +113,20 @@ class AzureBlobAdapterTest extends TestCase
         $this->blobStorageClientMock
             ->expects($this->once())
             ->method('createBlockBlob')
-            ->with('dir1/dir2', 'test.txt', $filePointer);
-        $this->instance->uploadFile('dir1/dir2', __DIR__ . '/files/test.txt');
+            ->with('container', 'dir/test2.txt', $filePointer);
+        $this->instance->uploadFile(__DIR__ . '/files/test.txt', 'dir/test2.txt');
         $mockFopen->disable();
+    }
+
+    public function testUploadFile_ContainerNotSet(): void
+    {
+        $adapter = new \ReflectionClass(AzureBlobAdapter::class);
+        $containerName = $adapter->getProperty('containerName');
+        $containerName->setAccessible(true);
+        $containerName->setValue($this->instance, '');
+
+        $this->expectException(InvalidDestinationException::class);
+        $this->instance->uploadFile(__DIR__ . '/files/test.txt', 'dir/test2.txt');
     }
 
     public function dataProvider_testDeleteFile(): array
@@ -123,6 +147,17 @@ class AzureBlobAdapterTest extends TestCase
             ->with(dirname($file), basename($file));
 
         $this->instance->deleteFile($file);
+    }
+
+    public function testDeleteFile_ContainerNotSet(): void
+    {
+        $adapter = new \ReflectionClass(AzureBlobAdapter::class);
+        $containerName = $adapter->getProperty('containerName');
+        $containerName->setAccessible(true);
+        $containerName->setValue($this->instance, '');
+
+        $this->expectException(InvalidDestinationException::class);
+        $this->instance->deleteFile('file-to-delete');
     }
 
     public function dataProvider_testDeleteFile_Exceptions(): array
@@ -189,6 +224,17 @@ class AzureBlobAdapterTest extends TestCase
         $this->assertCount(2, $files);
     }
 
+    public function testListFilesInDirectory_ContainerNotSet(): void
+    {
+        $adapter = new \ReflectionClass(AzureBlobAdapter::class);
+        $containerName = $adapter->getProperty('containerName');
+        $containerName->setAccessible(true);
+        $containerName->setValue($this->instance, '');
+
+        $this->expectException(InvalidDestinationException::class);
+        $this->instance->listFilesInDirectory('directory');
+    }
+
     public function dataProvider_testListFilesInDirectory_Exceptions(): array
     {
         $serviceException    = new ServiceException(new Response());
@@ -240,6 +286,17 @@ class AzureBlobAdapterTest extends TestCase
             'https://storage-account.blob.core.windows.net/dirA/dirB/file1.jpgsas',
             $this->instance->getPublicFileUrl($file)
         );
+    }
+
+    public function testGetPublicFileUrl_ContainerNotSet(): void
+    {
+        $adapter = new \ReflectionClass(AzureBlobAdapter::class);
+        $containerName = $adapter->getProperty('containerName');
+        $containerName->setAccessible(true);
+        $containerName->setValue($this->instance, '');
+
+        $this->expectException(InvalidDestinationException::class);
+        $this->instance->getPublicFileUrl('path/to/file');
     }
 
     public function dataProvider_testGetPublicFileUrl_Exceptions(): array
