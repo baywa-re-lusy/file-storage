@@ -72,10 +72,16 @@ workflows:
   version: 2
   test:
     jobs:
-      - build
+      - build:
+          context:
+            - ACR_CREDENTIALS
       - static:
+          context:
+            - ACR_CREDENTIALS
           requires:
             - build
       - phpunit:
+          context:
+            - ACR_CREDENTIALS
           requires:
             - build
