@@ -15,22 +15,36 @@ use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 class AzureBlobAdapter implements FileStorageAdapterInterface
 {
     protected const CONNECTION_STRING = 'BlobEndpoint=https://%s.blob.core.windows.net/;SharedAccessSignature=%s';
+    protected const CONNECTION_STRING_CONFIGURABLE = 'BlobEndpoint=%s;SharedAccessSignature=%s';
 
     protected ?BlobRestProxy $blobStorageClient = null;
 
     public function __construct(
         protected string $storageAccountName,
         protected string $containerName,
-        protected string $sharedAccessSignature
+        protected string $sharedAccessSignature,
+        protected ?string $blobEndpoint = null
     ) {
     }
 
     protected function getBlobStorageClient(): BlobRestProxy
     {
         if (!$this->blobStorageClient) {
-            $this->blobStorageClient = BlobRestProxy::createBlobService(
-                sprintf(self::CONNECTION_STRING, $this->storageAccountName, $this->sharedAccessSignature)
+            $connectionString = sprintf(
+                self::CONNECTION_STRING,
+                $this->storageAccountName,
+                $this->sharedAccessSignature
             );
+
+            if (is_string($this->blobEndpoint)) {
+                $connectionString = sprintf(
+                    self::CONNECTION_STRING_CONFIGURABLE,
+                    $this->blobEndpoint,
+                    $this->sharedAccessSignature
+                );
+            }
+
+            $this->blobStorageClient = BlobRestProxy::createBlobService($connectionString);
         }
 
         return $this->blobStorageClient;
@@ -169,20 +183,24 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
             //check that the file exists, getBlobUrl doesn't care
             $this->getBlobStorageClient()->getBlob(dirname($pathToFile), basename($pathToFile));
             return $this->getBlobStorageClient()->getBlobUrl(
-                ltrim(dirname($pathToFile), '/'),
-                basename($pathToFile)
-            ) . $this->sharedAccessSignature;
+                    ltrim(dirname($pathToFile), '/'),
+                    basename($pathToFile)
+                ) . $this->sharedAccessSignature;
         } catch (ServiceException $e) {
             if (str_contains($e->getMessage(), '<Code>BlobNotFound</Code>')) {
-                throw new RemoteFileDoesntExistException(sprintf(
-                    "The file '%s' doesn't exist.",
-                    basename($pathToFile)
-                ));
+                throw new RemoteFileDoesntExistException(
+                    sprintf(
+                        "The file '%s' doesn't exist.",
+                        basename($pathToFile)
+                    )
+                );
             } elseif (str_contains($e->getMessage(), '<Code>ContainerNotFound</Code>')) {
-                throw new DirectoryDoesntExistsException(sprintf(
-                    "The container '%s' doesn't exist.",
-                    dirname($pathToFile)
-                ));
+                throw new DirectoryDoesntExistsException(
+                    sprintf(
+                        "The container '%s' doesn't exist.",
+                        dirname($pathToFile)
+                    )
+                );
             }
             throw new UnknownErrorException('Unknown File Storage error');
         }
