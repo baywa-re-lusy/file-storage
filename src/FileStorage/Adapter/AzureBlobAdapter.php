@@ -121,8 +121,8 @@ class AzureBlobAdapter implements FileStorageAdapterInterface
 
         try {
             $this->getBlobStorageClient()->deleteBlob(
-                dirname($pathToFile),
-                basename($pathToFile)
+                $this->containerName,
+                $pathToFile
             );
         } catch (ServiceException $e) {
             if (str_contains($e->getMessage(), '<Code>BlobNotFound</Code>')) {
